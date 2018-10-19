@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vns.dao.HomeTokenMapper">
+    <resultMap id="BaseResultMap" type="com.vns.vo.HomeToken">
+        <id column="ID" property="id" jdbcType="INTEGER"/>
+        <result column="TokenSum" property="tokenSum" jdbcType="INTEGER"/>
+        <result column="TokenUserSum" property="tokenUserSum" jdbcType="BIGINT"/>
+        <result column="TokenTransferSum" property="tokenTransferSum" jdbcType="BIGINT"/>
+        <result column="TokenGasSum" property="tokenGasSum" jdbcType="DOUBLE"/>
+        <result column="TokenPoundageSum" property="tokenPoundageSum" jdbcType="DOUBLE"/>
+        <result column="MaxGasToken" property="maxGasToken" jdbcType="VARCHAR"/>
+        <result column="MaxPoundage" property="maxPoundage" jdbcType="DOUBLE"/>
+        <result column="MaxUsersToken" property="maxUsersToken" jdbcType="VARCHAR"/>
+        <result column="MaxUsers" property="maxUsers" jdbcType="INTEGER"/>
+        <result column="MaxGas" property="maxGas" jdbcType="DOUBLE"/>
+        <result column="MaxPoundageToken" property="maxPoundageToken" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="query" resultMap="BaseResultMap">
+        select 
+	        ID,
+	        TokenSum,
+	        TokenUserSum,
+	        TokenTransferSum,
+	        TokenGasSum,
+	        TokenPoundageSum,
+	        MaxGasToken,
+	        MaxGas,
+	        MaxUsersToken,
+	        MaxUsers
+        from t_home_token
+    </select>
+    <select id="queryCount" resultType="int">
+        SELECT COUNT(ID) FROM t_home_token
+    </select>
+    
+    <insert id="insert">
+    	insert into t_home_token(
+    		TokenSum,
+	        TokenUserSum,
+	        TokenTransferSum,
+	        TokenGasSum,
+	        TokenPoundageSum,
+	        MaxGasToken,
+	        MaxGas,
+	        MaxUsersToken,
+	        MaxUsers
+    	)values(
+    		#{tokenSum},
+    		#{tokenUserSum},
+    		#{tokenTransferSum},
+    		#{tokenGasSum},
+    		#{tokenPoundageSum},
+    		#{maxGasToken},
+    		#{maxGas},
+    		#{maxUsersToken},
+    		#{maxUsers}
+    	)
+    </insert>
+    
+    <update id="update">
+    	update t_home_token set 
+    		TokenSum=#{tokenSum},
+    		TokenUserSum=#{tokenUserSum},
+    		TokenTransferSum=#{tokenTransferSum},
+    		TokenGasSum=#{tokenGasSum},
+    		TokenPoundageSum=#{tokenPoundageSum},
+    		MaxGasToken=#{maxGasToken},
+    		MaxGas=#{maxGas},
+    		MaxUsersToken=#{maxUsersToken},
+    		MaxUsers=#{maxUsers}
+    	where ID=#{id}
+    </update>
+    
+    <select id="findHomeToken" resultMap="BaseResultMap">
+    	select count(1) as TokenSum,
+    	(select t.USER_ADDRESS_COUNT from (select count(userAddress) USER_ADDRESS_COUNT,ContractAddress as CONTRACT_ADDRESS from t_token_users group by CONTRACT_ADDRESS order by USER_ADDRESS_COUNT desc) t limit 1) as MaxUsers,
+    	(select t.CONTRACT_ADDRESS from (select count(userAddress) USER_ADDRESS_COUNT,ContractAddress as CONTRACT_ADDRESS from t_token_users group by CONTRACT_ADDRESS order by USER_ADDRESS_COUNT desc) t limit 1) as MaxUsersToken,
+    	(select count(DISTINCT UserAddress) from t_token_users) as tokenUserSum,
+    	(select count(1) from t_transaction where TransactionType = 1) as TokenTransferSum,
+    	(select sum(Gas) from t_transaction where TransactionType = 1) as TokenGasSum,
+    	(select sum(Gas*Gasprice) from t_transaction where TransactionType = 1) as TokenPoundageSum,
+    	(select max(Gas*Gasprice) from t_transaction where TransactionType = 1) as MaxPoundage,
+    	(select ContractAddress from t_transaction where (Gas*Gasprice) = (select max(Gas*Gasprice) from t_transaction where TransactionType = 1) and TransactionType = 1 order by TransactionTime desc limit 1) as MaxPoundageToken 
+    	from t_token where ContractAddress is not null
+    </select>
+</mapper>

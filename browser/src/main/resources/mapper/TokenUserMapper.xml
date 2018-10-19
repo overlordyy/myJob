@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vns.dao.TokenUserMapper">
+    <resultMap id="BaseResultMap" type="com.vns.vo.TokenUser">
+        <id column="ID" property="id" jdbcType="BIGINT"/>
+        <result column="ContractAddress" property="contractAddress" jdbcType="VARCHAR"/>
+        <result column="UserAddress" property="userAddress" jdbcType="VARCHAR"/>
+        <result column="TokenBalance" property="tokenBalance" jdbcType="DOUBLE"/>
+        <result column="CreateTime" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <select id="query" resultMap="BaseResultMap">
+        select 
+	        ID,
+	        ContractAddress,
+	        UserAddress
+        from t_token_users
+    </select>
+    <select id="queryCount" resultType="int">
+        SELECT COUNT(ID) FROM t_token_users
+    </select>
+    
+    <select id="queryTokenUserNum" resultMap="BaseResultMap">
+        select 
+	        ContractAddress,
+	        COUNT(ID) as userNum
+        from t_token_users GROUP BY ContractAddress
+    </select>
+    
+    <select id="isExists" resultType="int">
+        SELECT COUNT(ID) FROM t_token_users ContractAddress = #{contractAddress} and UserAddress = #{userAddress}
+    </select>
+    
+    <insert id="insert">
+    	insert into t_token_users(
+    		ContractAddress,
+	        UserAddress,
+	        TokenBalance,
+	        CreateTime,
+	        UpdateTime
+    	)values(
+    		#{contractAddress},
+    		#{userAddress},
+    		#{tokenBalance},
+    		#{createTime},
+    		#{updateTime}
+    	)
+    </insert>
+    
+</mapper>

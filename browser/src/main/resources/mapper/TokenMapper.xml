@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vns.dao.TokenMapper">
+    <resultMap id="BaseResultMap" type="com.vns.vo.TokenInfo">
+        <id column="ID" property="id" jdbcType="BIGINT"/>
+        <result column="ContractAddress" property="contractAddress" jdbcType="VARCHAR"/>
+        <result column="tokenEnName" property="tokenEnName" jdbcType="VARCHAR"/>
+        <result column="tokenCnName" property="tokenCnName" jdbcType="VARCHAR"/>
+        <result column="tokenName" property="tokenName" jdbcType="VARCHAR"/>
+        <result column="tokenTotal" property="tokenTotal" jdbcType="VARCHAR"/>
+        <result column="tokenReceivetAddress" property="tokenReceivetAddress" jdbcType="VARCHAR"/>
+        <result column="tokenPrecision" property="tokenPrecision" jdbcType="VARCHAR"/>
+        <result column="tokenPublisher" property="tokenPublisher" jdbcType="VARCHAR"/>
+        <result column="tokenPublicKey" property="tokenPublicKey" jdbcType="VARCHAR"/>
+        <result column="tokenPrivateKey" property="tokenPrivateKey" jdbcType="VARCHAR"/>
+        <result column="tokenType" property="tokenType" jdbcType="VARCHAR"/>
+        <result column="publishTime" property="publishTime" jdbcType="TIMESTAMP"/>
+        <result column="validityTime" property="validityTime" jdbcType="TIMESTAMP"/>
+        <result column="tokenStatus" property="tokenStatus" jdbcType="VARCHAR"/>
+        <result column="airdropPercent" property="airdropPercent" jdbcType="VARCHAR"/>
+        <result column="logoUrl" property="logoUrl" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="tokenBalance" property="tokenBalance" jdbcType="VARCHAR"/>
+        <result column="tokenDecimals" property="tokenDecimals" jdbcType="VARCHAR"/>
+        <result column="tokenExaminedContent" property="tokenExaminedContent" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="queryAll" resultMap="BaseResultMap">
+        select 
+        ID,
+        tokenEnName,
+        tokenCnName,
+        tokenName,
+        tokenTotal,
+        tokenReceivetAddress,
+        tokenPrecision,
+        tokenPublisher,
+        tokenPublicKey,
+        tokenPrivateKey,
+        tokenType,
+        publishTime,
+        validityTime,
+        tokenStatus,
+        airdropPercent,
+        logoUrl,
+        remark,
+        ContractAddress,
+        tokenBalance,
+        tokenDecimals,
+        case when tokenStatus=2 then (select log_examined_content from t_token_examined_log_t where token_id = ID order by log_examined_date desc LIMIT 1) end as tokenExaminedContent
+        from t_token
+        <include refid="base_where"/>
+        LIMIT #{beginIndex},#{pageSize}
+    </select>
+    <select id="queryAllForCount" resultType="int">
+        SELECT COUNT(ID)
+        from t_token
+        <include refid="base_where"/>
+    </select>
+    <sql id="base_where">
+        <where>
+            <if test="tokenPublisher!=null">
+                AND tokenPublisher LIKE concat('%', #{tokenPublisher}, '%')
+            </if>
+	        <if test="search!='' and search!=null">
+	        	and (ContractAddress = #{search} or tokenCnName = #{search} or tokenName = #{search} or tokenEnName = #{search})
+	        </if>
+        </where>
+    </sql>
+    
+    
+    <insert id="insertToken">
+    	insert into t_token(
+    		ContractAddress,
+    		tokenEnName,
+    		tokenName,
+    		tokenTotal,
+    		tokenReceivetAddress,
+    		tokenBalance,
+    		tokenDecimals
+    	)values(
+    		#{contractAddress},
+    		#{tokenEnName},
+    		#{tokenName},
+    		#{tokenTotal},
+    		#{tokenReceivetAddress},
+    		#{tokenBalance},
+    		#{tokenDecimals}
+    	)
+    </insert>
+    
+    <select id="findTokenByAddress" resultType="int">
+    	select count(1) from t_token
+    	where tokenReceivetAddress = #{tokenReceivetAddress}
+    </select>
+</mapper>

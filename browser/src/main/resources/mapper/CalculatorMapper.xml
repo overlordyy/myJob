@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vns.dao.CalculatorMapper">
+    <resultMap id="BaseResultMap" type="com.vns.vo.Calculator">
+        <id column="ID" property="id" jdbcType="BIGINT"/>
+       	<result column="YesterdayHashRate" property="yesterdayHashRate" jdbcType="DOUBLE"/>
+		<result column="YesterdayDifficulty" property="yesterdayDifficulty" jdbcType="DOUBLE"/>
+		<result column="YesterdayTxPoundage" property="yesterdayTxPoundage" jdbcType="DOUBLE"/>
+		<result column="YesterdayBlockReward" property="yesterdayBlockReward" jdbcType="BIGINT"/>
+		<result column="YesterdayUncleBlockReward" property="yesterdayUncleBlockReward" jdbcType="BIGINT"/>
+		<result column="YesterdayRefUncleReward" property="yesterdayRefUncleReward" jdbcType="BIGINT"/>
+		<result column="YesterdayOutputCoins" property="yesterdayOutputCoins" jdbcType="DOUBLE"/>
+		<result column="YesterdayTime" property="yesterdayTime" jdbcType="TIMESTAMP"/>
+		<result column="yesterdayTxPoundageWei" property="yesterdayTxPoundageWei" jdbcType="DOUBLE"/>
+		<result column="YesterdayBlockNum" property="yesterdayBlockNum" jdbcType="INTEGER"/>
+		<result column="YesterdayNormalBlockNum" property="yesterdayNormalBlockNum" jdbcType="INTEGER"/>
+		<result column="YesterdayUncleBlockNum" property="yesterdayUncleBlockNum" jdbcType="INTEGER"/>
+		<result column="YesterdayRefUncleNum" property="yesterdayRefUncleNum" jdbcType="INTEGER"/>
+		<result column="YesterdayProduceBlockTime" property="yesterdayProduceBlockTime" jdbcType="DOUBLE"/>
+    </resultMap>
+
+    <select id="getCalculatorParam" resultMap="BaseResultMap">
+        select ID,
+	        YesterdayHashRate,
+	        YesterdayDifficulty,
+	        YesterdayTxPoundage,
+	        YesterdayBlockReward,
+	        YesterdayUncleBlockReward,
+	        YesterdayRefUncleReward,
+	        YesterdayOutputCoins,
+	        YesterdayBlockNum,
+	        YesterdayNormalBlockNum,
+	        YesterdayUncleBlockNum,
+	        YesterdayRefUncleNum,
+	        YesterdayProduceBlockTime,
+	        YesterdayTime
+        from t_calculator_param
+        where DATE_FORMAT(YesterdayTime,'%y-%m-%d') = DATE_FORMAT(#{yesterdayTime,jdbcType=DATE},'%y-%m-%d')
+        order by YesterdayTime desc
+    </select>
+    
+    <select id="getReportByTime" resultMap="BaseResultMap">
+        select ID,
+	        YesterdayHashRate,
+	        YesterdayDifficulty,
+	        YesterdayTime
+        from t_calculator_param
+        where DATE_FORMAT(YesterdayTime,'%y-%m-%d') &gt;= DATE_FORMAT(#{beginDate,jdbcType=DATE},'%y-%m-%d') 
+        	and DATE_FORMAT(YesterdayTime,'%y-%m-%d') &lt;= DATE_FORMAT(#{endDate,jdbcType=DATE},'%y-%m-%d')
+        order by YesterdayTime asc
+    </select>
+    
+    <select id="getReportAllData" resultMap="BaseResultMap">
+        select ID,
+	        YesterdayHashRate,
+	        YesterdayDifficulty,
+	        YesterdayTime
+        from t_calculator_param
+        order by YesterdayTime asc
+    </select>
+    
+    <select id="isExist" resultType="int">
+        select count(ID) from t_calculator_param where DATE_FORMAT(YesterdayTime,'%y-%m-%d') = DATE_FORMAT(#{yesterdayTime,jdbcType=DATE},'%y-%m-%d')
+    </select>
+    
+    <select id="statCalculateParam" resultMap="BaseResultMap">
+    	select 
+    	(select avg(b.Difficulty) from t_block b where b.BlockTime between #{beginDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}) as YesterdayDifficulty,
+    	(select count(b.ID) from t_block b where b.BlockTime between #{beginDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}) as YesterdayBlockNum,
+    	(select count(b.ID) from t_block b where b.isUncle = 0 and b.BlockTime between #{beginDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}) as YesterdayNormalBlockNum,
+    	(select count(b.ID) from t_block b where b.isUncle = 1 and b.BlockTime between #{beginDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}) as YesterdayUncleBlockNum,
+    	(select sum(tx.TransactionPoundage) from t_transaction tx where tx.TransactionTime between #{beginDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}) as YesterdayTxPoundageWei,
+    	(select sum(b.MinerReward) from t_block b where b.isUncle = 0 and b.BlockTime between #{beginDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}) as YesterdayBlockReward,
+    	(select sum(b.MinerReward) from t_block b where b.isUncle = 1 and b.BlockTime between #{beginDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}) as YesterdayUncleBlockReward,
+    	(select sum(b.UnclesNum) from t_block b where b.isUncle = 0 and b.BlockTime between #{beginDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}) as YesterdayRefUncleNum
+    </select>
+    
+    <insert id="insert">
+    	insert into t_calculator_param
+    	(
+    		YesterdayHashRate,
+	        YesterdayDifficulty,
+	        YesterdayTxPoundage,
+	        YesterdayBlockReward,
+	        YesterdayUncleBlockReward,
+	        YesterdayRefUncleReward,
+	        YesterdayOutputCoins,
+	        YesterdayTime,
+	        YesterdayBlockNum,
+	        YesterdayNormalBlockNum,
+	        YesterdayUncleBlockNum,
+	        YesterdayRefUncleNum,
+	        YesterdayProduceBlockTime
+    	)values(
+    		#{yesterdayHashRate},
+    		#{yesterdayDifficulty},
+    		#{yesterdayTxPoundage},
+    		#{yesterdayBlockReward},
+    		#{yesterdayUncleBlockReward},
+    		#{yesterdayRefUncleReward},
+    		#{yesterdayOutputCoins},
+    		#{yesterdayTime},
+    		#{yesterdayBlockNum},
+    		#{yesterdayNormalBlockNum},
+    		#{yesterdayUncleBlockNum},
+    		#{yesterdayRefUncleNum},
+    		#{yesterdayProduceBlockTime}
+    	)
+    </insert>
+    
+    <update id="update">
+    	update t_calculator_param set 
+    		YesterdayHashRate=#{yesterdayHashRate},
+    		YesterdayDifficulty=#{yesterdayDifficulty},
+    		YesterdayTxPoundage=#{yesterdayTxPoundage},
+    		YesterdayBlockReward=#{yesterdayBlockReward},
+    		YesterdayUncleBlockReward=#{yesterdayUncleBlockReward},
+    		YesterdayRefUncleReward=#{yesterdayRefUncleReward},
+    		YesterdayOutputCoins=#{yesterdayOutputCoins},
+    		YesterdayBlockNum=#{yesterdayBlockNum},
+    		YesterdayNormalBlockNum=#{yesterdayNormalBlockNum},
+    		YesterdayUncleBlockNum=#{yesterdayUncleBlockNum},
+    		YesterdayRefUncleNum=#{yesterdayRefUncleNum},
+    		YesterdayProduceBlockTime=#{yesterdayProduceBlockTime}
+    	where DATE_FORMAT(YesterdayTime,'%y-%m-%d') = DATE_FORMAT(#{yesterdayTime,jdbcType=DATE},'%y-%m-%d')
+    </update>
+</mapper>

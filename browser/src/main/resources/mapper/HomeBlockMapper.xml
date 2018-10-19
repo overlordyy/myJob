@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vns.dao.HomeBlockMapper">
+    <resultMap id="BaseResultMap" type="com.vns.vo.HomeBlock">
+        <id column="ID" property="id" jdbcType="INTEGER"/>
+        <result column="LastBlockHeight" property="lastBlockHeight" jdbcType="BIGINT"/>
+        <result column="NormalBlockSum" property="normalBlockSum" jdbcType="BIGINT"/>
+        <result column="UncleBlockSum" property="uncleBlockSum" jdbcType="BIGINT"/>
+        <result column="BlockSum" property="blockSum" jdbcType="BIGINT"/>
+        <result column="TransactionSum" property="transactionSum" jdbcType="BIGINT"/>
+        <result column="UnclePercent" property="unclePercent" jdbcType="FLOAT"/>
+        <result column="TransactionsAvg" property="transactionsAvg" jdbcType="FLOAT"/>
+        <result column="zBlockHash" property="zBlockHash" jdbcType="VARCHAR"/>
+        <result column="zBlockTime" property="zBlockTime" jdbcType="TIMESTAMP"/>
+        <result column="BlockProduceTime" property="blockProduceTime" jdbcType="BIGINT"/>
+        <result column="Difficulty" property="difficulty" jdbcType="VARCHAR"/>
+    </resultMap>
+	
+	<select id="queryNewData"  resultMap="BaseResultMap">
+		select 
+		max(blockNumber) as LastBlockHeight,
+		(select (select BlockTime from t_block where blockNumber = (select max(blockNumber) from t_block) and isUncle = 0)-(select BlockTime from t_block where blockNumber = (select max(blockNumber)-1 from t_block) and isUncle = 0) from dual) as BlockProduceTime,
+		(select Difficulty from t_block where blockNumber = (select max(blockNumber) from t_block) and isUncle = 0) as Difficulty,
+		(select count(1) from t_block) as BlockSum,
+		(select count(1) from t_block where isuncle = 0) as NormalBlockSum,
+		(select count(1) from t_block where isuncle = 1) as UncleBlockSum,
+		(select count(1) from t_transaction) as TransactionSum,
+		(select BlockHash from t_block where BlockNumber = 0) as zBlockHash,
+		(select BlockTime from t_block where BlockNumber = 0) as zBlockTime
+		from t_block;
+	</select>
+
+    <select id="query" resultMap="BaseResultMap">
+        select 
+	        ID,
+	        LastBlockHeight,
+	        NormalBlockSum,
+	        UncleBlockSum,
+	        BlockSum,
+	        UnclePercent,
+	        TransactionsAvg,
+	        BlockProduceTime,
+	        Difficulty,
+			(select BlockHash from t_block where BlockNumber = 0) as zBlockHash,
+			(select BlockTime from t_block where BlockNumber = 0) as zBlockTime
+        from t_home_block
+        limit 1
+    </select>
+    <select id="queryCount" resultType="int">
+        SELECT COUNT(ID) FROM t_home_block
+    </select>
+    
+    <insert id="insert">
+    	insert into t_home_block(
+    		LastBlockHeight,
+	        NormalBlockSum,
+	        UncleBlockSum,
+	        BlockSum,
+	        UnclePercent,
+	        TransactionsAvg,
+	        BlockProduceTime,
+	        Difficulty
+    	)values(
+    		#{lastBlockHeight},
+    		#{normalBlockSum},
+    		#{uncleBlockSum},
+    		#{blockSum},
+    		#{unclePercent},
+    		#{transactionsAvg},
+    		#{blockProduceTime},
+    		#{difficulty}
+    	)
+    </insert>
+    
+    <update id="update">
+    	update t_home_block set 
+    		LastBlockHeight=#{lastBlockHeight},
+    		NormalBlockSum=#{normalBlockSum},
+    		UncleBlockSum=#{uncleBlockSum},
+    		BlockSum=#{blockSum},
+    		UnclePercent=#{unclePercent},
+    		TransactionsAvg=#{transactionsAvg}
+    	where ID=#{id}
+    </update>
+    
+    <delete id="delete">
+    	delete from t_home_block
+    </delete>
+</mapper>

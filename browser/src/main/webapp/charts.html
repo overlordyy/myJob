@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>区块</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <link href="resources/css/jquery-ui-themes.css" type="text/css" rel="stylesheet"/>
+    <link href="resources/css/axure_rp_page.css" type="text/css" rel="stylesheet"/>
+    <link href="data/styles.css" type="text/css" rel="stylesheet"/>
+    <link href="files/block/styles.css" type="text/css" rel="stylesheet"/>
+    <script src="resources/scripts/jquery-1.7.1.min.js"></script>
+    <script src="resources/scripts/jquery-ui-1.8.10.custom.min.js"></script>
+    <script src="charts/code/highcharts.js"></script>
+    <style>
+	    .chartsDiv{
+	    	cursor: pointer;
+	    	float: left;
+		    width: 270px;
+		    height: 200px;
+		    text-align: left;
+	        color: #1D9ED7;
+	    }
+	    .chartsDiv img{
+    	    width: 195px;
+    		height: 145px;
+	    }
+    </style>
+  </head>
+  <body>
+    <div id="base" class="">
+      <!-- Unnamed (Text Field) -->
+      <div id="u229" class="ax_default text_field">
+      </div>
+      
+      <!-- Unnamed (Rectangle) -->
+      <div id="u189" class="ax_default box_1">
+      	<div class="chartsDiv" onclick="openCharts('hashRateCharts')"><span>日均全网算力</span><img src="images/hashRateCharts.png"/></div>
+      	<div class="chartsDiv" onclick="openCharts('diffcultyCharts')"><span>日均区块难度</span><img src="images/diffcultyCharts.png"/></div>
+      	<div class="chartsDiv" onclick="openCharts('txCharts')"><span>日增交易笔数</span><img src="images/txCharts.png"/></div>
+      	<div class="chartsDiv" onclick="openCharts('tokenTxCharts')"><span>日增Token交易笔数</span><img src="images/tokenTxCharts.png"/></div>
+      	<div class="chartsDiv" onclick="openCharts('priceCharts')"><span>每	日	币	价</span><img src="images/priceCharts.png"/></div>
+      	<div class="chartsDiv" onclick="openCharts('vnsValueCharts')"><span>每	日	市	值</span><img src="images/vnsVulueReport.png"/></div>
+      	<div class="chartsDiv" onclick="openCharts('newUserCharts')"><span>日增用户数</span><img src="images/newUserCharts.png"/></div>
+      	<div class="chartsDiv" onclick="openCharts('newTokenUserCharts')"><span>日增Token用户数</span><img src="images/newTokenUserCharts.png"/></div>
+      	<div class="chartsDiv" onclick="openCharts('totalUserCharts')"><span>每日累计用户数</span><img src="images/totalUserCharts.png"/></div>
+      	<div class="chartsDiv" onclick="openCharts('totalTokenUserCharts')"><span>Token每日累计用户数</span><img src="images/totalTokenUserCharts.png"/></div>
+      </div>
+      <!-- Unnamed (Table) -->
+      <div id="u333" class="ax_default" style="text-align: left;display: none;">
+      </div>
+    </div>
+    <script type="text/javascript">
+    	$(function(){
+			$("#u155").css("top","1029px");
+			$("#u157").css("top","1050px");
+			$("#u159").css("top","1050px");
+			$("#u161").css("top","1050px");
+			$("#u163").css("top","1050px");
+    	});
+		function openCharts(charts){
+			$("#u155").css("top","750px");
+			$("#u157").css("top","764px");
+			$("#u159").css("top","764px");
+			$("#u161").css("top","764px");
+			$("#u163").css("top","764px");
+			$("#main").load(charts+'.html', 
+                             function(){
+                             }
+                     );
+		}
+	</script>
+  </body>
+</html>

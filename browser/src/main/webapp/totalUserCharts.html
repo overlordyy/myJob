@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>区块</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <link href="resources/css/jquery-ui-themes.css" type="text/css" rel="stylesheet"/>
+    <link href="resources/css/axure_rp_page.css" type="text/css" rel="stylesheet"/>
+    <link href="data/styles.css" type="text/css" rel="stylesheet"/>
+    <link href="files/block/styles.css" type="text/css" rel="stylesheet"/>
+    <script src="resources/scripts/jquery-1.7.1.min.js"></script>
+    <script src="resources/scripts/jquery-ui-1.8.10.custom.min.js"></script>
+    <script src="charts/code/highcharts.js"></script>
+  </head>
+  <body>
+    <div id="base" class="">
+      <!-- Unnamed (Text Field) -->
+      <div id="u229" class="ax_default text_field">
+      </div>
+      
+      <!-- Unnamed (Rectangle) -->
+      <div id="u189" class="ax_default box_1">
+      	<div id="totalUserCharts" style="max-width:800px;height:400px"></div>
+      </div>
+      <!-- Unnamed (Table) -->
+      <div id="u333" class="ax_default" style="text-align: left;display: none;">
+      </div>
+    </div>
+    <script type="text/javascript">
+		$(function () {
+            Highcharts.setOptions({
+                lang: {
+                    numericSymbols: [" k", " M", " B", " T", " P", " E"]
+                }
+            });  
+			$.ajax({
+				type:"GET",
+				url:"/browser/report/totalUserReport",
+				data:null,
+				dataType:"json",
+				success:function(dataR){
+				debugger;
+					Highcharts.chart('totalUserCharts',{
+		                chart: {
+		                    zoomType: 'x',
+		                    resetZoomButton: {
+		                        position: {
+		                            align: 'right', // right by default
+		                            verticalAlign: 'top',
+		                            x: -55,
+		                            y: 10
+		                        },
+		                        relativeTo: 'chart'
+		                    }
+		                },
+		                title: {
+		                    text: ' 每日累计用户数 '
+		                },
+		                subtitle: {
+		                    text: document.ontouchstart === undefined ?
+		                        '数据来源: vnscoin.org<br>点击并拖动绘图区域以放大' :
+		                        '缩放图表以放大'
+		                }, 
+		                xAxis: {
+		                    type:'datetime',
+		                    minRange: 14 * 24 * 3600000
+		                                        
+		                },               
+		                yAxis: {
+		                    title: {
+		                        text: '每日累计用户数  '
+		                    },
+		                    min: 0,
+		                    // 
+		                },
+		                legend: {
+		                    enabled: false
+		                },
+		                plotOptions: {
+		                    area: {
+		                        fillColor: {
+		                            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+		                            stops: [
+		                                [0, Highcharts.getOptions().colors[0]],
+		                                [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+		                            ]
+		                        },
+		                        marker: {
+		                            radius: 2
+		                        },
+		                        lineWidth: 1,
+		                        states: {
+		                            hover: {
+		                                lineWidth: 1
+		                            }
+		                        },
+		                        threshold: null
+		                    }
+		                },
+		                credits: {
+		                    enabled: false
+		                },               
+		                tooltip: {
+		                    formatter: function () {
+		                        return '<span style="font-size:10px">' + this.point.dt + '</span><br><table><tr><td style="padding:0">' +
+		                              
+		                            '[ <span style="color:' + this.series.color + '">累计数 : </a></span><b>' + this.point.y + '</b> ]<br>' +
+		                              
+		                                '</td></tr></table>';
+		                    }
+		                },
+		                series: [{
+		                    type: 'area',
+		                    turboThreshold: 7000,
+		                    name: 'Daily Transaction Count',
+		                    pointInterval: 24 * 3600 * 1000,
+		                    pointStart: Date.UTC(2018, 5, 22) ,
+		            		data: dataR
+		            	}]
+		            });
+				}
+			});          
+        });      
+	</script>
+  </body>
+</html>

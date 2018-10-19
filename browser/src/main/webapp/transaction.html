@@ -1,0 +1,433 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>交易</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <link href="resources/css/jquery-ui-themes.css" type="text/css" rel="stylesheet"/>
+    <link href="resources/css/axure_rp_page.css" type="text/css" rel="stylesheet"/>
+    <link href="data/styles.css" type="text/css" rel="stylesheet"/>
+    <link href="files/transaction/styles.css" type="text/css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="styles/bootstrap4/bootstrap-table.css">
+	<link rel="stylesheet" href="styles/swiper/swiper-4.3.5.min.css">
+	<link rel="stylesheet" type="text/css" href="styles/bootstrap4/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="styles/search-form.css">
+	<style>
+		label {
+		    display: inline-block;
+		    margin-bottom: 0px;
+		    float: left;
+		}
+		.icon_boxes{
+			width: 100%;
+		    padding-bottom: 0px;
+		    padding-top: 140px;
+		}
+		button {
+		    background-color: #1D9ED7;
+		    border: none;
+		    color: white;
+		    padding: 0px 8px;
+		    text-align: center;
+		    text-decoration: none;
+		    display: inline-block;
+		    font-size: 16px;
+		    margin: 4px 2px;
+		    cursor: pointer;
+		}
+		.control-group{
+		    height: 30px;
+		    font-size:12px;
+		}
+		.control-group p{
+		    font-size:12px;
+		    width: 100%;
+		    text-align: right;
+    		color: #1D9ED7;
+		    word-wrap: break-word;
+    		word-break: break-all;
+		}
+		.control-group label{
+		    margin-left: 15px;    
+		    width: 73px;
+    		text-align: left;
+		}
+		fieldset{
+		    margin-top: 30px;
+		}
+        .search-wrapper .input-holder .search-icon span::after {
+		    width: 18px;
+		    height: 18px;
+		    left: 4px;
+		    top: 0px;
+		    border-radius: 16px;
+		    border: 4px solid #169BD5;
+		}
+		.table tbody tr td{
+	      overflow: hidden; 
+	      text-overflow:ellipsis;  
+	      white-space: nowrap; 
+		 }
+		 .colStyle {
+		    text-overflow: ellipsis;
+		    overflow: hidden;
+		    white-space: nowrap;
+		}
+	</style>
+  </head>
+  <body>
+    <div id="base" class="">
+      <!-- Unnamed (Table) -->
+      <div id="u677" class="ax_default">
+      	<table id="transactionList" class="table table-condensed table-bordered table-hover table-striped " style="table-layout: fixed;"></table>
+      </div>
+      <!-- Unnamed (File) -->
+      <div id="u720" class="ax_default label">
+        <img id="u720_img" class="img " src="images/transaction/u720.png"/>
+        <!-- Unnamed () -->
+        <div id="u721" class="text" style="visibility: visible;">
+        	<p>总交易数<span id="transactionNum">XXX</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u722" class="ax_default box_1">
+        <div>
+        	<input id="searchs" type="text" style="margin-bottom: 10px;width: 200px;" placeholder="交易Hash，支付方，接收方">
+        	<button type="submit" onclick="findTransaction()" style="font-size: 12px;height: 20px;">查询</button>
+	    </div>
+      </div>
+    </div>
+
+<script src="resources/scripts/jquery-1.7.1.min.js"></script>
+<script src="resources/scripts/jquery-ui-1.8.10.custom.min.js"></script>
+<script src="styles/bootstrap4/popper.js"></script>
+<script src="styles/bootstrap4/bootstrap.min.js"></script>
+<script src="styles/bootstrap4/bootstrap-table.js"></script>
+<script src="styles/bootstrap4/bootstrap-table-zh-CN.js"></script>
+<script>
+var transaction;
+function findTransactionInfo(transactionHash){
+	//请求交易信息
+	$.ajax({
+		type:"GET",
+		url:"/browser/transaction/findTransactionByHash",
+		data:{hash:transactionHash},
+		dataType:"json",
+		success:function(data){
+		debugger;
+			var txt="<div style='width: 100%;height: 90%;'>"+
+						"<form class='form-horizontal'>                               "+
+						"<fieldset>                                                   "+
+						"<div class='control-group'>                                  "+
+						"<label class='control-label' for='input01'>交易Hash</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.hash+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>区块hash</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.blockHash+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>块龄</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.blockTimeStr+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>支付方</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.fromAddress+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>接收方</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.toAddress+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>交易额</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.txValueStr+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>Gas数量</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.gas+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>Gas使用量</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.gasUsed+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>Gas单价</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.gasPriceStr+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>手续费</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.transactionPoundageStr+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>随机数</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.nonce+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>Input</label>"+
+						"<div class='controls'>                                       "+
+						"<div style='width: 470px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;'>"+
+						"<span class='help-block'>"+data.data.input+"</span></div>               "+
+						"</div>                                                       "+
+						"</div>                                                       "+
+						"</fieldset>                                                  "+
+						"</form>                                                      "+
+						"<input class='blockNumber' value='"+data.data.hash+"' type='hidden'/></div>";
+			window.wxc.xcConfirm(txt, window.wxc.xcConfirm.typeEnum.info,null,'dataInfo');
+		}
+	});
+}
+function findBlockInfo(blockHash){
+	//请求区块信息
+	$.ajax({
+		type:"GET",
+		url:"/browser/block/findBlockInfoByHash",
+		data:{blockHash:blockHash},
+		dataType:"json",
+		success:function(data){
+			var txt="<div style='width: 100%;height: 90%;'>"+
+						"<form class='form-horizontal'>                               "+
+						"<fieldset>                                                   "+
+						"<div class='control-group'>                                  "+
+						"<label class='control-label' for='input01'>区块高度</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.blockNumber+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>块龄</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.blockTimeStr+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>区块Hash</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.blockHash+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>叔块列Hash</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.sha3Uncles+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>矿工</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.miner+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>挖矿难度</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.difficulty+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>总难度</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.totalDifficulty+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>区块大小</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.blockSize+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>Gas使用量</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.gasUsed+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>Gas上限</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.gasLimit+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>随机数</label>"+
+						"<div class='controls'>                                       "+
+						"<span class='help-block'>"+data.data.nonceStr+"</span>               "+
+						"</div>                                                       "+
+						"</div><div class='control-group'>                            "+
+						"<label class='control-label' for='input01'>附加数据</label>"+
+						"<div class='controls'>                                       "+
+						"<div style='width: 470px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;'>"+
+						"<span class='help-block'>"+data.data.extraData+"</span></div>               "+
+						"</div>                                                       "+
+						"</div>                                                       "+
+						"</fieldset>                                                  "+
+						"</form>                                                      "+
+						"<input class='blockNumber' value='"+data.data.hash+"' type='hidden'/></div>";
+			window.wxc.xcConfirm(txt, window.wxc.xcConfirm.typeEnum.info,null,'dataInfo');
+		}
+	});
+}
+$(function(){
+	transactionTableInit();
+})
+function transactionTableInit(){
+	if($("#searchValue").val()!=""){
+		$("#searchs").val($("#searchValue").val());
+	}
+	var blockNumber = -1;
+	$("#transactionList").bootstrapTable('destroy');
+	transaction = $("#transactionList").bootstrapTable({
+        url: '/browser/transaction/findTransaction',
+        method: 'get',
+        height:580,
+        dataType: "json",
+        striped: true,//设置为 true 会有隔行变色效果
+        undefinedText: "空",//当数据为 undefined 时显示的字符
+        pagination: true, //分页
+        // paginationLoop:true,//设置为 true 启用分页条无限循环的功能。
+        //showToggle: "true",//是否显示 切换试图（table/card）按钮
+        //showColumns: "true",//是否显示 内容列下拉框
+        pageNumber: 1,//如果设置了分页，首页页码
+        // showPaginationSwitch:true,//是否显示 数据条数选择框
+        pageSize: 20,//如果设置了分页，页面数据条数
+        pageList: [20, 30, 60, 120],	//如果设置了分页，设置可供选择的页面数据条数。设置为All 则显示所有记录。
+        paginationPreText: '‹',//指定分页条中上一页按钮的图标或文字,这里是<
+        paginationNextText: '›',//指定分页条中下一页按钮的图标或文字,这里是>
+        // singleSelect: false,//设置True 将禁止多选
+        search: false, //显示搜索框
+        data_local: "zh-US",//表格汉化
+        sidePagination: "server", //服务端处理分页
+        queryParams: function (params) {//自定义参数，这里的参数是传给后台的，我这是是分页用的
+            return {//这里的params是table提供的
+                currentPage: params.offset,//从数据库第几条记录开始
+                pageSize: params.limit,//找多少条
+                blockNumber: blockNumber,
+                search:$("#searchs").val()
+            };
+        },
+        idField: "id",//指定主键列
+        columns: [
+            {
+                title: '交易Hash',//表的列名
+                field: 'hash',//json数据中rows数组中的属性名
+                align: 'center',//水平居中
+                width:100,
+                class:'colStyle',
+                formatter:function(value,row,index){
+				    var values = value;//获取当前字段的值
+				    //替换空格，因为字符串拼接的时候如果遇到空格，会自动将后面的部分截掉，所有这里用html的转义符
+				    //&nbsp;代替
+				    if(row.status == "0x0"){
+				    	return "<span style='color:red;cursor: pointer;' title='失败交易'>！</span><span title="+values+" style='color: #1D9ED7;cursor: pointer;' onclick='findTransactionInfo(\""+values+"\")'>"+values+"</span>";
+				    }else{
+				    	return "<span title="+values+" style='color: #1D9ED7;cursor: pointer;' onclick='findTransactionInfo(\""+values+"\")'>"+values+"</span>";
+				    }
+	            }
+            },
+            {
+                title: '区块高度',
+                field: 'blockNumber',
+                align: 'center',
+                width:80,
+                formatter:function(value,row,index){
+				    var values = value;//获取当前字段的值
+				    //替换空格，因为字符串拼接的时候如果遇到空格，会自动将后面的部分截掉，所有这里用html的转义符
+				    //&nbsp;代替
+				    return "<span title="+values+" style='color: #1D9ED7;cursor: pointer;' onclick='findBlockInfo(\""+row.blockHash+"\")'>"+values+"</span>"
+	            }
+            },{
+                title: '支付方',
+                field: 'fromAddress',
+                align: 'center',
+                width:100,
+                class:'colStyle',
+                formatter:clickAddressOperate
+            },
+            {
+                title: '接收方',
+                field: 'toAddress',
+                align: 'center',
+                width:100,
+                class:'colStyle',
+                formatter:clickAddressOperate
+            },
+            {
+                title: '交易额',
+                field: 'txValueStr',
+                align: 'center',
+                width:100,
+                class:'colStyle',
+                formatter:paramsMatter
+            },{
+                title: 'Gas',
+                field: 'gas',
+                align: 'center',
+                width:60,
+                class:'colStyle',
+                formatter:paramsMatter
+            },{
+                title: 'GasUsed',
+                field: 'gasUsed',
+                align: 'center',
+                width:60,
+                class:'colStyle',
+                formatter:paramsMatter
+            },{
+                title: 'Gas单价',
+                field: 'gasPriceStr',
+                align: 'center',
+                width:100,
+                class:'colStyle',
+                formatter:paramsMatter
+            },{
+                title: '手续费',
+                field: 'transactionPoundageStr',
+                align: 'center',
+                width:100,
+                class:'colStyle',
+                formatter:paramsMatter
+            }
+        ],
+        onLoadSuccess:function(data){
+        	console.log(data);
+        	$("#transactionNum").html(data.total);
+        }
+    });
+    
+    transaction.on('load-success.bs.table', function (data) {//table加载成功后的监听函数
+        console.log("load success");
+        $(".pull-right").css("display", "block");
+    });
+}
+
+function findTransaction(){
+	$("#transactionList").bootstrapTable('destroy');
+	transactionTableInit();
+}
+
+function findTransactionByAddress(address){
+	$("#searchs").val(address);
+	$("#transactionList").bootstrapTable('destroy');
+	transactionTableInit();
+}
+
+function paramsMatter(value, row, index) {
+    var values = value;//获取当前字段的值
+    //替换空格，因为字符串拼接的时候如果遇到空格，会自动将后面的部分截掉，所有这里用html的转义符
+    //&nbsp;代替
+    return "<span title="+values+">"+values+"</span>"
+}
+
+function clickAddressOperate(value, row, index){
+	var searchsVal = $("#searchs").val();
+	if(searchsVal !="" && searchsVal == value){
+		return "<span title="+value+">"+value+"</span>";
+	}else{
+		return "<span title="+value+" style='color: #1D9ED7;cursor: pointer;' onclick='findTransactionByAddress(\""+value+"\")'>"+value+"</span>";
+	}
+}
+</script>
+  </body>
+</html>

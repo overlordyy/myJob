@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vns.dao.TransactionMapper">
+    <resultMap id="BaseResultMap" type="com.vns.vo.TransactionInfo">
+        <id column="ID" property="id" jdbcType="BIGINT"/>
+        <result column="Hash" property="hash" jdbcType="VARCHAR"/>
+        <result column="BlockHash" property="blockHash" jdbcType="VARCHAR"/>
+        <result column="BlockNumber" property="blockNumber" jdbcType="INTEGER"/>
+        <result column="Creates" property="creates" jdbcType="VARCHAR"/>
+        <result column="FromAddress" property="fromAddress" jdbcType="VARCHAR"/>
+        <result column="ToAddress" property="toAddress" jdbcType="VARCHAR"/>
+        <result column="TxValue" property="txValue" jdbcType="DOUBLE"/>
+        <result column="Gas" property="gas" jdbcType="FLOAT"/>
+        <result column="GasPrice" property="gasPrice" jdbcType="FLOAT"/>
+        <result column="Input" property="input" jdbcType="VARCHAR"/>
+        <result column="Nonce" property="nonce" jdbcType="VARCHAR"/>
+        <result column="PublicKey" property="publicKey" jdbcType="VARCHAR"/>
+        <result column="R" property="r" jdbcType="VARCHAR"/>
+        <result column="Raw" property="raw" jdbcType="VARCHAR"/>
+        <result column="S" property="s" jdbcType="VARCHAR"/>
+        <result column="TransactionIndex" property="transactionIndex" jdbcType="VARCHAR"/>
+        <result column="V" property="v" jdbcType="VARCHAR"/>
+        <result column="TransactionTime" property="transactionTime" jdbcType="TIMESTAMP"/>
+        <result column="TransactionType" property="transactionType" jdbcType="INTEGER"/>
+        <result column="ContractAddress" property="contractAddress" jdbcType="VARCHAR"/>
+        <result column="TransactionPoundage" property="transactionPoundage" jdbcType="DOUBLE"/>
+        <result column="blockTime" property="blockTime" jdbcType="INTEGER"/>
+        <result column="tokenEnName" property="tokenEnName" jdbcType="VARCHAR"></result>
+    </resultMap>
+
+    <select id="findTransactionList" resultMap="BaseResultMap">
+        select 
+        	ts.ID,
+	        ts.Hash,
+	        <if test="tokenHash!='' and tokenHash!=null">
+	        	tto.tokenEnName,
+	        </if>
+	        ts.BlockHash,
+	        ts.BlockNumber,
+	        ts.FromAddress,
+	        ts.ToAddress,
+	        ts.TxValue,
+	        ts.Gas,
+	        ts.GasPrice,
+			ts.Input,
+			ts.Nonce,
+			ts.PublicKey,
+			ts.TransactionIndex,
+			ts.TransactionTime,
+			ts.TransactionType,
+			ts.ContractAddress,
+			ts.TransactionPoundage
+        from t_transaction ts
+        <if test="tokenHash!='' and tokenHash!=null">
+        	left join t_token tto on ts.ContractAddress = tto.ContractAddress
+        </if>
+        <where>
+	        <if test="blockNumber!=null and blockNumber!=-1">
+	        	and ts.BlockNumber = #{blockNumber}
+	        </if>
+	        <if test="tokenHash!='' and tokenHash!=null">
+	        	and ts.ContractAddress = #{tokenHash}
+	        </if>
+	        <if test="search!='' and search!=null">
+	        	and (ts.Hash = #{search} or ts.FromAddress = #{search} or ts.ToAddress = #{search} or ts.BlockHash = #{search} or ts.BlockNumber = #{search})
+	        </if>
+        </where>
+        order by BlockNumber desc
+        LIMIT #{beginIndex},#{pageSize}
+    </select>
+    
+    <select id="findTransactionListCount" resultType="int">
+    	select count(1) from t_transaction 
+    	<where>
+	        <if test="blockNumber!=null and blockNumber!=-1">
+	        	and BlockNumber = #{blockNumber}
+	        </if>
+	        <if test="tokenHash!='' and tokenHash!=null">
+	        	and ContractAddress = #{tokenHash}
+	        </if>
+	        <if test="search!='' and search!=null">
+	        	and (Hash = #{search} or FromAddress = #{search} or ToAddress = #{search} or BlockHash = #{search} or BlockNumber = #{search})
+	        </if>
+	     </where>
+    </select>
+    
+    <select id="findTransactionByHash" resultMap="BaseResultMap">
+    	select 
+        	ID,
+	        Hash,
+	        BlockHash,
+	        BlockNumber,
+	        FromAddress,
+	        ToAddress,
+	        TxValue,
+	        Gas,
+	        GasPrice,
+			Input,
+			Nonce,
+			PublicKey,
+			TransactionIndex,
+			TransactionTime,
+			TransactionType,
+			ContractAddress,
+			TransactionPoundage
+        from t_transaction ts
+        <where>
+	        <if test="hash!=null and hash!=''">
+	        	and Hash = #{hash}
+	        </if>
+        </where>
+        LIMIT 1
+    </select>
+    
+    <select id="findAllTransaction" resultMap="BaseResultMap">
+        select 
+	        distinct(BlockNumber) as BlockNumber
+        from t_transaction
+        LIMIT 96000,100000
+    </select>
+    
+    <select id="findTransactionInfoByBlock" resultMap="BaseResultMap">
+    	select 
+	        TransactionID,
+			Amount,
+			Poundage,
+			Payer,
+			Receiver,
+			TransactionTime,
+			TransactionType,
+			BlockID,
+			BlockNumber
+        from t_transaction
+        order by BlockNumber desc
+        where BlockID = #{blockId,jdbcType=VARCHAR}
+    </select>
+    
+    <insert id="addTransaction">
+    	insert into t_transaction
+	    (
+	   		TransactionID,
+			Amount,
+			Poundage,
+			Payer,
+			Receiver,
+			TransactionTime,
+			TransactionType,
+			BlockID,
+			BlockNumber
+		)values(
+			#{transactionID},
+			#{amount},
+			#{poundage},
+			#{payer},
+			#{receiver},
+			#{transactionTime},
+			#{transactionType},
+			#{blockId},
+			#{blockNumber}
+		)
+    </insert>
+    
+    <select id="transactionDivInfo" resultMap="BaseResultMap">
+    	select count(1) as transactionNum,SUM(Amount) as transactionNumAmount,SUM(Poundage) as transactionNumPoundage from t_transaction;
+    </select>
+    
+    <select id="getYesterdayTxFromAddr" resultMap="BaseResultMap">
+    	select tx.FromAddress,tx.TransactionTime from t_transaction tx 
+    		where tx.TransactionTime between #{beginDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}
+			and tx.FromAddress not in (select u.UserAddress from t_users u)
+    </select>
+    
+    <select id="getYesterdayTxToAddr" resultMap="BaseResultMap">
+    	select tx.ToAddress,tx.TransactionTime from t_transaction tx 
+    		where tx.TransactionTime between #{beginDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}
+			and tx.ToAddress not in (select u.UserAddress from t_users u)
+    </select>
+    
+    <select id="getYesterdayTokenTxFromAddr" resultMap="BaseResultMap">
+    	select tx.FromAddress,tx.TransactionTime from t_transaction tx 
+    		where tx.TransactionTime between #{beginDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP} 
+    		and tx.TransactionType = 1 
+			and tx.ContractAddress not in (select u.ContractAddress from t_token_users u) 
+			and tx.FromAddress not in (select u.UserAddress from t_token_users u)
+    </select>
+    
+    <select id="getYesterdayTokenTxToAddr" resultMap="BaseResultMap">
+    	select tx.ToAddress,tx.TransactionTime from t_transaction tx 
+    		where tx.TransactionTime between #{beginDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP} 
+    		and tx.TransactionType = 1 
+    		and tx.ContractAddress not in (select u.ContractAddress from t_token_users u) 
+			and tx.ToAddress not in (select u.UserAddress from t_token_users u) 
+    </select>
+    
+</mapper>

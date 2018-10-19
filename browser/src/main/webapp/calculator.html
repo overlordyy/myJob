@@ -1,0 +1,312 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>挖矿计算器</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <link href="resources/css/jquery-ui-themes.css" type="text/css" rel="stylesheet"/>
+    <link href="files/calculator/styles.css" type="text/css" rel="stylesheet"/>
+    <script src="resources/scripts/jquery-1.7.1.min.js"></script>
+    <script src="resources/scripts/jquery-ui-1.8.10.custom.min.js"></script>
+    <script type="text/javascript" src="js/plugins/jquery-validation/jquery.validate.js"></script>
+    <script type="text/javascript" src="js/plugins/jquery.form.js"></script>
+    <script type="text/javascript">
+	    $(function(){
+			// 
+			$.ajax({
+				type:"GET",
+				url:"/browser/calculator/getVnsData",
+				data:null,
+				dataType:"json",
+				success:function(data){
+					$("#yesterdayHashRate").val(data.data.yesterdayHashRate);
+					$("#yesterdayDifficulty").val(data.data.yesterdayDifficulty);
+					$("#yesterdayHashRateDisplay").val(data.data.yesterdayHashRateDisplay);
+					$("#yesterdayDifficultyDisplay").val(data.data.yesterdayDifficultyDisplay);
+					$("#yesterdayOutputCoins").val(data.data.yesterdayOutputCoins);
+					$("#priceRmb").val(data.data.priceRmb);
+					$("#priceDoller").val(data.data.priceDoller);
+				}
+			});
+			
+			$("#calculatorForm").validate({
+				rules: {
+					"myHashRate": {
+						required: true,
+						number:true,
+						min:0
+					},
+					"power": {
+						number:true,
+						min:0
+					},
+					"electricPrice": {
+						number:true,
+						min:0
+					},
+					"deviceCost": {
+					    number:true,
+						min:0
+					},
+					"yesterdayHashRateDisplay": {
+						required: true,
+						number:true,
+						min:0
+					},
+					"priceRmb": {
+					    required: true,
+						number:true,
+						min:0
+					}
+				},
+				messages: {
+					"myHashRate": {
+						required: "请填写您的算力值，注意单位是H/S",
+						number: "请输入数字",
+						min: "不能小于0"
+					},
+					"power": {
+						number: "请输入数字",
+						min: "不能小于0"
+					},
+					"electricPrice": {
+						number: "请输入数字",
+						min: "不能小于0"
+					},
+					"deviceCost": {
+					    number: "请输入数字",
+						min: "不能小于0"
+					},
+					"yesterdayHashRateDisplay": {
+						required: "请填写全网算力值，注意单位是KH/S",
+						number: "请输入数字",
+						min: "不能小于0"
+					},
+					"priceRmb": {
+					    required: "请填写当前币价值，注意单位是元",
+						number: "请输入数字",
+						min: "不能小于0"
+					}
+				},
+
+				errorClass: "text-danger",
+				highlight: function (element, errorClass) {
+					$(element).closest("div.form-group").addClass("has-error");
+				},
+				unhighlight: function (element, errorClass) {
+					$(element).closest("div.form-group").removeClass("has-error");
+				}
+			});
+			
+			$("#submitBtn").on("click",function(){
+				var power = $("#power").val();
+				if (isnull(power)) {
+					$("#power").val(0);
+				}
+				var electricPrice = $("#electricPrice").val();
+				if (isnull(electricPrice)) {
+					$("#electricPrice").val(0);
+				}
+				var deviceCost = $("#deviceCost").val();
+				if (isnull(deviceCost)) {
+					$("#deviceCost").val(0);
+				}
+				
+				$("#calculatorForm").valid();
+				$('#calculatorForm').ajaxSubmit({		
+					 url: '/browser/calculator/calculate',		
+					 type: 'post',
+					 dataType: 'json',
+					 beforeSubmit: function () {},	
+					 success: function (data) {	
+						$("#dayCoin").html(data.data.dayCoin);
+						$("#dayCoinRmb").html(data.data.dayCoinRmb);
+						$("#dayElectric").html(data.data.dayElectric);
+						$("#dayElectricCost").html(data.data.dayElectricCost);
+						$("#dayNetProfit").html(data.data.dayNetProfit);
+						
+						$("#weekCoin").html(data.data.weekCoin);
+						$("#weekCoinRmb").html(data.data.weekCoinRmb);
+						$("#weekElectric").html(data.data.weekElectric);
+						$("#weekElectricCost").html(data.data.weekElectricCost);
+						$("#weekNetProfit").html(data.data.weekNetProfit);
+						
+						$("#monthCoin").html(data.data.monthCoin);
+						$("#monthCoinRmb").html(data.data.monthCoinRmb);
+						$("#monthElectric").html(data.data.monthElectric);
+						$("#monthElectricCost").html(data.data.monthElectricCost);
+						$("#monthNetProfit").html(data.data.monthNetProfit);
+						
+						$("#yearCoin").html(data.data.yearCoin);
+						$("#yearCoinRmb").html(data.data.yearCoinRmb);
+						$("#yearElectric").html(data.data.yearElectric);
+						$("#yearElectricCost").html(data.data.yearElectricCost);
+						$("#yearNetProfit").html(data.data.yearNetProfit);
+						
+						var costRecoveryStr = "";
+						if(data.data.costRecoveryDay>0){
+							costRecoveryStr="回本时间： <span style='font-size:16px ;color: #169BD5;'> "+data.data.costRecoveryDay+" </span>&nbsp;天 = "+
+								"<span style='font-size:16px ;color: #169BD5;'> "+data.data.costRecoveryMonth+" </span>&nbsp;月";
+						}
+						$("#costRecovery").html(costRecoveryStr);
+						
+						// $("#coinTab").css("display","block");
+					 },
+					 clearForm: false,//禁止清除表单	
+					 resetForm: false //禁止重置表
+				 });
+			});
+			
+			// 空判断
+			function isnull(val) {
+		        var str = val.replace(/(^\s*)|(\s*$)/g, '');//去除空格;
+		        if (str == '' || str == undefined || str == null) {
+		            return true;
+		        } else {
+		            return false;
+		        }
+    		}
+		});	
+    </script>
+  </head>
+  <body>
+    <div id="base" class="">
+	  	<form id="calculatorForm" class="form-horizontal" action="/browser/calculator/calculate" method="post" >
+	  	
+	      <div id="u0" class="ax_default box_1">
+	        <div id="u0_div" class=""></div>
+	        <!-- Unnamed () -->
+	        <div id="u1" class="text" style="display: none; visibility: hidden">
+	          <p><span></span></p>
+	        </div>
+	      </div>
+	      <!-- Unnamed (Shape) -->
+	      <div id="u173" class="ax_default icon">
+	        <img id="u173_img" class="img " src="images/calculator/tips.png"/>
+	        <!-- Unnamed () -->
+	        <div id="u174" class="text" style="visibility: visible;">
+	          <p><span>提示</span></p>
+	        </div>
+	        <div id="u175" class="text" style="visibility: visible;text-align:left">
+	          <p><span>由于出块时长、全网算力波动等原因，计算结果仅供参考。</span></p>
+	        </div>
+	      </div>
+	      <div id="u179" class="ax_default box_1">
+	        <div id="u179_div" class=""></div>
+	        <!-- Unnamed () -->
+	        <div id="u180" class="text" style="display: none; visibility: hidden">
+	          <p><span></span></p>
+	        </div>
+	      </div>
+      
+	      <div id="u1061" class="">
+	      	 <label class="col-sm-4 control-label" style="font-size:16px ;color: #169BD5;">
+	                            基础数据 : 
+	         </label>
+	         <br>
+	      	 <input type="hidden" name="yesterdayHashRate" id="yesterdayHashRate" />
+	      	 <input type="hidden" name="yesterdayDifficulty" id="yesterdayDifficulty" />
+	      	 <input type="hidden" name="yesterdayOutputCoins" id="yesterdayOutputCoins" />
+	      	 
+	      	 <div class="form-group">
+		      	 <label class="col-sm-4 control-label">昨日全网算力 : </label>
+		      	 <span style="color:red;margin-left:39px;"> * </span> 
+		         <input type="text" name="yesterdayHashRateDisplay" id="yesterdayHashRateDisplay" /> KH/S
+	         </div>
+	         <div class="form-group">
+	         	 <label class="col-sm-4 control-label">当前币价(人民币) : </label>
+	         	 <span style="color:red;margin-left:14px;"> * </span>
+		         <input type="text" name="priceRmb" id="priceRmb" />￥/VNS
+	         </div>
+	         <div class="form-group">
+		         <label class="col-sm-4 control-label">当前币价(美元) : </label>
+		         <input type="text" name="priceDoller" id="priceDoller" style="margin-left:40px;" readonly="readonly"/> $/VNS
+	         </div>
+	      	 <div class="form-group">
+		         <label class="col-sm-4 control-label"> 昨日挖矿难度 : </label>
+		         <input type="text" name="yesterdayDifficultyDisplay" id="yesterdayDifficultyDisplay" style="margin-left:50px;background-color:#e3e3e3;" readonly="readonly"/> M
+	         </div>
+	         
+	         <label class="col-sm-4 control-label" style="font-size:16px ;color: #169BD5;">
+	                            我的数据 : 
+	         </label>
+	         <br/>
+	         <div class="form-group">
+		         <label class="col-sm-4 control-label"> 我的算力 : </label>
+		         <span style="color:red;margin-left:69px;"> * </span>
+		         <input type="text" name="myHashRate" id="myHashRate"/> H/S
+	         </div>
+	         <div class="form-group">
+		         <label class="col-sm-4 control-label">我的功耗 : </label>
+		         <input type="text" name="power" id="power" value="120" style="margin-left:80px;"/> W
+	         </div>
+	         <div class="form-group">
+		         <label class="col-sm-4 control-label"> 每度电价 : </label>
+		         <input type="text" name="electricPrice" id="electricPrice" value="0.2" style="margin-left:80px;"/> ￥
+	         </div>
+	         <div class="form-group">
+		         <label class="col-sm-4 control-label">设备成本 : </label>
+		         <input type="text" name="deviceCost" id="deviceCost" value="500" style="margin-left:80px;" /> ￥
+	         </div>
+	         
+	         <div class="form-group">
+                 <button id="submitBtn" type="button">
+                     	&nbsp;&nbsp;计  算&nbsp;&nbsp;
+                 </button>
+             </div>
+             
+	         <div id="coinTab">
+		         <label class="col-sm-4 control-label" style="font-size:16px ;color: #169BD5;">
+		                            计算结果 : 
+		         </label>
+	             <table>
+	             	<tr>
+		             	<th width="60px">时间</th>
+		             	<th width="130px">收益（币）</th>
+		             	<th width="130px">收益（￥）</th>
+		             	<th width="140px">耗电量（度）</th>
+		             	<th width="130px">电费（￥）</th>
+		             	<th width="140px">净收益（￥）</th>
+	             	</tr>
+	             	<tr>
+		             	<th>每日</th>
+		             	<td id="dayCoin"></td>
+		             	<td id="dayCoinRmb"></td>
+		             	<td id="dayElectric"></td>
+		             	<td id="dayElectricCost"></td>
+		             	<td id="dayNetProfit"></td>
+	             	</tr>
+	             	<tr>
+		             	<th>每周</th>
+		             	<td id="weekCoin"></td>
+		             	<td id="weekCoinRmb"></td>
+		             	<td id="weekElectric"></td>
+		             	<td id="weekElectricCost"></td>
+		             	<td id="weekNetProfit"></td>
+	             	</tr>
+	             	<tr>
+		             	<th>每月</th>
+		             	<td id="monthCoin"></td>
+		             	<td id="monthCoinRmb"></td>
+		             	<td id="monthElectric"></td>
+		             	<td id="monthElectricCost"></td>
+		             	<td id="monthNetProfit"></td>
+	             	</tr>
+	             	<tr>
+		             	<th>每年</th>
+		             	<td id="yearCoin"></td>
+		             	<td id="yearCoinRmb"></td>
+		             	<td id="yearElectric"></td>
+		             	<td id="yearElectricCost"></td>
+		             	<td id="yearNetProfit"></td>
+	             	</tr>
+	             </table>
+	             
+	             <p id="costRecovery"></p>
+             </div>
+	      </div>
+	      
+		</form>
+    </div>
+  </body>
+</html>

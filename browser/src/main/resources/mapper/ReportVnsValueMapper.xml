@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vns.dao.ReportVnsValueMapper">
+    <resultMap id="BaseResultMap" type="com.vns.vo.ReportVnsValue">
+        <id column="ID" property="id" jdbcType="BIGINT"/>
+       	<result column="EthValue" property="ethValue" jdbcType="DOUBLE"/>
+        <result column="DollerValue" property="dollerValue" jdbcType="DOUBLE"/>
+        <result column="RmbValue" property="rmbValue" jdbcType="DOUBLE"/>
+        <result column="CreateDate" property="createDate" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <select id="getReportByTime" resultMap="BaseResultMap">
+        select ID,
+	        EthValue,
+	        DollerValue,
+	        RmbValue,
+	        CreateDate
+        from t_report_vnsvalue
+        where DATE_FORMAT(CreateDate,'%y-%m-%d') &gt;= DATE_FORMAT(#{beginDate,jdbcType=DATE},'%y-%m-%d') 
+        	and DATE_FORMAT(CreateDate,'%y-%m-%d') &lt;= DATE_FORMAT(#{endDate,jdbcType=DATE},'%y-%m-%d')
+        order by CreateDate asc
+    </select>
+    
+    <select id="getReportAllData" resultMap="BaseResultMap">
+        select ID,
+	        EthValue,
+	        DollerValue,
+	        RmbValue,
+	        CreateDate
+        from t_report_vnsvalue
+        order by CreateDate asc
+    </select>
+    
+    <select id="isExist" resultType="int">
+        select count(ID) from t_report_vnsvalue where DATE_FORMAT(CreateDate,'%y-%m-%d') = DATE_FORMAT(#{createDate,jdbcType=DATE},'%y-%m-%d')
+    </select>
+    
+    <insert id="insert">
+    	insert into t_report_vnsvalue
+    	(
+    		EthValue,
+	        DollerValue,
+	        RmbValue,
+	        CreateDate
+    	)values(
+    		#{ethValue},
+    		#{dollerValue},
+    		#{rmbValue},
+    		#{createDate}
+    	)
+    </insert>
+    
+    <update id="update">
+    	update t_report_vnsvalue set 
+    		EthValue=#{ethValue},
+    		DollerValue=#{dollerValue},
+    		RmbValue=#{rmbValue}
+    	where DATE_FORMAT(CreateDate,'%y-%m-%d') = DATE_FORMAT(#{createDate,jdbcType=DATE},'%y-%m-%d')
+    </update>
+</mapper>

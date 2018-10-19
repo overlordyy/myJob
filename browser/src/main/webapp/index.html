@@ -1,0 +1,344 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>VNScan</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <link rel="shortcut icon" href="images/vnscanLogo.png">
+    <link href="resources/css/jquery-ui-themes.css" type="text/css" rel="stylesheet"/>
+    <link href="resources/css/axure_rp_page.css" type="text/css" rel="stylesheet"/>
+    <link href="data/styles.css" type="text/css" rel="stylesheet"/>
+    <link href="files/home/styles.css" type="text/css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="styles/main_styles.css">
+	<link rel="stylesheet" type="text/css" href="styles/responsive.css">
+	<link rel="stylesheet" type="text/css" href="styles/search-form.css">
+	<link rel="stylesheet" type="text/css" href="styles/xcConfirm.css">
+	<link rel="stylesheet" type="text/css" href="styles/loading.css">
+    <script src="resources/scripts/jquery-1.7.1.min.js"></script>
+    <script src="resources/scripts/jquery-ui-1.8.10.custom.min.js"></script>
+    <script src="js/xcConfirm.js"></script>
+    <script src="js/loading.js"></script>
+    <style>
+    	#u146 span,#u133,#u143,#u137,#u139,#u141{
+    		cursor: pointer;
+    	}
+    	a:link {   
+			font-size: 12px;   
+			color: #000000;   
+			text-decoration: none;   
+		}   
+		a:visited {   
+			font-size: 12px;   
+			color: #000000;   
+			text-decoration: none;   
+		}   
+		a:hover {   
+			font-size: 12px;   
+			color: #999999;   
+			text-decoration: underline;   
+		} 
+    </style>
+  </head>
+  <body>
+    <div id="base" class="">
+    <!-- Unnamed (Rectangle) -->
+      <div id="u129" class="ax_default heading_1">
+        <div id="u129_div" class=""></div>
+        <!-- Unnamed () -->
+        <div id="u130" class="text" style="visibility: visible;">
+          <p style="font-size:24px;">
+          <span style="font-family:'Arial Normal', 'Arial';font-weight:400;font-size:16px;color:#999999;">VNS已运行</span>
+          <span style="font-family:'Arial Normal', 'Arial';font-weight:400;font-size:13px;color:#999999;"> </span>
+          <span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;color:#1D9ED7;" id="days">加载中</span><span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;font-size:13px;"></span><span style="font-family:'Arial Normal', 'Arial';font-weight:400;font-size:16px;color:#999999;">天</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u145" class="ax_default box_1">
+        <div id="u145_div" class=""></div>
+        <!-- Unnamed () -->
+        <div id="u146" class="text" style="visibility: visible;">
+          <p><span id="home" class="jump" style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;color:#169BD5;" onclick="upClick('home')">首页</span>
+          <span id="block" class="jump" style="font-family:'Arial Normal', 'Arial';font-weight:400;color:#797979;" onclick="upClick('block')">&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; 区块</span>
+          <span id="transaction" class="jump" style="font-family:'Arial Normal', 'Arial';font-weight:400;color:#797979;" onclick="upClick('transaction')">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 交易</span>
+          <span id="token" class="jump" style="font-family:'Arial Normal', 'Arial';font-weight:400;color:#797979;" onclick="upClick('token')">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; TOKEN&nbsp; &nbsp; &nbsp; &nbsp; </span></p>
+        </div>
+      </div>
+      
+      <!-- Unnamed (Horizontal Line) -->
+      <div id="u131" class="ax_default line">
+        <img id="u131_img" class="img " src="images/home/u131.png"/>
+        <!-- Unnamed () -->
+        <div id="u132" class="text" style="display: none; visibility: hidden">
+          <p><span></span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u133" class="ax_default box_1">
+        <img id="u133_img" class="img " src="images/home/u133.png"/>
+        <!-- Unnamed () -->
+        <div id="u134" class="text" style="visibility: visible;">
+          <p onclick="upClick('home')"><span style="color:#169BD5;">VN</span><span style="color:#666666;">S</span><span style="color:#169BD5;">can</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u135" class="ax_default label">
+        <div id="u135_div" class=""></div>
+        <!-- Unnamed () -->
+        <div id="u136" class="text" style="visibility: visible;">
+          <p><span>VNS Blockchain Explorer</span></p>
+        </div>
+      </div>
+      <!-- Unnamed (Shape) -->
+      <div id="u151" class="ax_default box_1">
+        <form onsubmit="submitFn(this, event);">
+			<div class="search-wrapper">
+				<div class="input-holder" style="height: 40px;border: 1px solid;width: 340px;">
+					<input id="searchValue" type="text" class="search-input" placeholder="支持搜索区块高度、交易Hash、Token" style="height: 20px;"/>
+					<button id="search" class="search-icon" onclick="searchToggle(this, event);" style="height: 20px;"><span onclick="findData()"></span></button>
+				</div>
+				<!--<span class="close" onclick="searchToggle(this, event);"></span>-->
+			</div>
+		</form>
+      </div>
+      
+      <!-- Unnamed (页眉、页尾、功能、广告) -->
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u137" class="ax_default label">
+        <!-- Unnamed () -->
+        <div id="u138" class="text" style="visibility: visible;">
+          <p><span id="bug" class="jump" onclick="upClick('bug')">BUG反馈</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u139" class="ax_default label">
+        <!-- Unnamed () -->
+        <div id="u140" class="text" style="visibility: visible;">
+          <p><span id="demand" class="jump" onclick="upClick('demand')">需求征集</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u141" class="ax_default label">
+        <!-- Unnamed () -->
+        <div id="u142" class="text" style="visibility: visible;">
+          <p><span id="charts" class="jump" onclick="upClick('charts')">图表统计</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u143" class="ax_default label">
+        <!-- Unnamed () -->
+        <div id="u144" class="text" style="visibility: visible;">
+          <p><span id="calculator" class="jump" style="font-family:'Arial Normal', 'Arial';font-weight:400;color:#797979;" 
+          	onclick="upClick('calculator')">挖矿计算器</span></p>
+        </div>
+      </div>
+
+      <!--<div id="u147" class="ax_default placeholder">
+        <img id="u147_img" class="img " src="images/home/u147.png"/>
+        <div id="u148" class="text" style="visibility: visible;">
+          <p><span>广告</span></p>
+        </div>
+      </div>
+
+      <div id="u149" class="ax_default placeholder">
+        <img id="u149_img" class="img " src="images/home/u149.png"/>
+        <div id="u150" class="text" style="visibility: visible;">
+          <p><span>广告</span></p>
+        </div>
+      </div>
+-->
+      <!-- Unnamed (Horizontal Line) -->
+      <div id="u155" class="ax_default line">
+        <img id="u155_img" class="img " src="images/home/u155.png"/>
+        <!-- Unnamed () -->
+        
+      </div>
+<div id="u156" class="text" style="display: none; visibility: hidden">
+          <p><span></span></p>
+        </div>
+      <!-- Unnamed (Rectangle) -->
+      <div id="u157" class="ax_default box_1">
+        <img id="u157_img" class="img " src="images/home/u157.png"/>
+        <!-- Unnamed () -->
+        <div id="u158" class="text" style="visibility: visible;">
+          <p style="font-size:16px;">
+          <span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;">合作伙伴</span></p>
+          <p style="font-size:14px;"><span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;"><br></span></p>
+          <p style="font-size:14px;"><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">AMT社区微博</span></p>
+          <p style="font-size:14px;"><span style="font-family:'Arial Normal', 'Arial';font-weight:400;"><a href="http://www.weibo.com/AMTCommunity" target="_blank">www.weibo.com/AMTCommunity</a></span></p>
+          <p style="font-size:14px;"><span style="font-family:'Arial Normal', 'Arial';font-weight:400;"><br></span></p>
+          <p style="font-size:14px;"><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">VNS官网</span></p>
+          <p style="font-size:14px;"><span style="font-family:'Arial Normal', 'Arial';font-weight:400;"><a href="http://www.vnscoin.org" target="_blank">www.vnscoin.org</a></span></p>
+          <p style="font-size:14px;"><span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;"><br></span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u159" class="ax_default box_1">
+        <img id="u159_img" class="img " src="images/home/u159.png"/>
+        <!-- Unnamed () -->
+        <div id="u160" class="text" style="visibility: visible;">
+          <p style="font-size:16px;"><span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;">常用链接</span></p>
+          <p style="font-size:14px;"><span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;"><br></span></p>
+          <p style="font-size:14px;"><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">CEX交易所官网</span></p>
+          <p style="font-size:14px;"><span style="font-family:'Arial Normal', 'Arial';font-weight:400;"><a href="http://cex.plus" target="_blank">cex.plus</a></span></p>
+          <p style="font-size:14px;"><span style="font-family:'Arial Normal', 'Arial';font-weight:400;"><br></span></p>
+          <p style="font-size:14px;"><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">币团交易所官网</span></p>
+          <p style="font-size:14px;"><span style="font-family:'Arial Normal', 'Arial';font-weight:400;"><a href="http://www.bituan.com/index" target="_blank">www.bituan.com/index</a></span></p>
+          <p style="font-size:14px;"><span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;"><br></span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u161" class="ax_default box_1">
+        <img id="u161_img" class="img " src="images/home/u159.png"/>
+        <!-- Unnamed () -->
+        <div id="u162" class="text" style="visibility: visible;">
+          <p style="font-size:16px;"><span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;">联系我们</span></p><p style="font-size:14px;"><span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;"><br></span></p><p style="font-size:14px;"><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">邮箱：</span></p><p style="font-size:14px;"><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">280129107@qq.com</span></p><p style="font-size:14px;"><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">876128@qq.com</span></p><p style="font-size:14px;"><span style="font-family:'Arial Normal', 'Arial';font-weight:400;"><br></span></p><p style="font-size:14px;"><span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;"><br></span></p><p style="font-size:14px;"><span style="font-family:'Arial Normal', 'Arial';font-weight:400;"><br></span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u163" class="ax_default box_1">
+        <img id="u163_img" class="img " src="images/home/u159.png"/>
+        <!-- Unnamed () -->
+        <div id="u164" class="text" style="visibility: visible;">
+          <p style="font-size:16px;"><span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;">做的不错哦，打赏！</span></p>
+          <p style="font-size:14px;"><span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;"><br></span></p><p style="font-size:14px;"><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">VNS打赏地址：</span></p>
+          <img src="images/reward.png" style="width: 90px;height: 90px;"/>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u165" class="ax_default label">
+        <div id="u165_div" class=""></div>
+        <!-- Unnamed () -->
+        <div id="u166" class="text" style="visibility: visible;">
+          <!--<p><span>富豪榜</span></p>-->
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u167" class="ax_default label">
+        <div id="u167_div" class=""></div>
+        <!-- Unnamed () -->
+        <div id="u168" class="text" style="visibility: visible;">
+          <!--<p><span>图表&amp;统计</span></p>-->
+        </div>
+      </div>
+	<div id="main">
+     
+    </div>
+    <script type="text/javascript">
+		var load = new Loading();
+		load.init();
+		$(function(){
+			$("#main").load('home.html', 
+                             function(){} 
+                     );
+		})
+		function upClick(mode){
+			$("#searchValue").val("");
+			if(mode=="block"){
+				load.start();
+				$("#main").load('block.html', 
+                             function(){}
+                     );
+				updateUCss(mode);
+			}
+			if(mode=="home"){
+				$("#main").load('home.html', 
+                             function(){}
+                     );
+				updateUCss(mode);
+			}
+			if(mode=="transaction"){
+				$("#main").load('transaction.html', 
+                             function(){}
+                     );
+				updateUCss(mode);
+			}
+			if(mode=="token"){
+				$("#main").load('token.html', 
+                             function(){}
+                     );
+				updateUCss(mode);
+			}
+			if(mode=="calculator"){
+				$("#main").load('calculator.html', 
+                             function(){}
+                     );
+				updateUCss(mode);
+			}
+			if(mode=="charts"){
+				$("#main").load('charts.html', 
+                             function(){}
+                     );
+				updateUCss(mode);
+			}
+			if(mode=="bug"){
+				var txt="请将bug反馈到邮箱【280129107@qq.com】或【876128@qq.com】，别忘了附上您的钱包地址，我们会给予相应的奖励！";
+				window.wxc.xcConfirm(txt, window.wxc.xcConfirm.typeEnum.info);
+			}
+			if(mode=="demand"){
+				var txt="请将需求反馈到邮箱【280129107@qq.com】或【876128@qq.com】，别忘了附上您的钱包地址，我们会给予相应的奖励！";
+				window.wxc.xcConfirm(txt, window.wxc.xcConfirm.typeEnum.info);
+			}
+		}
+		function updateUCss(mode){
+			$(".jump").css("font-weight","400");
+			$(".jump").css("color","#797979");
+			$("#"+mode).css("font-weight","700");
+			$("#"+mode).css("color","#169BD5");
+			$("#u155").css("top","750px");
+			$("#u157").css("top","764px");
+			$("#u159").css("top","764px");
+			$("#u161").css("top","764px");
+			$("#u163").css("top","764px");
+		}
+		function findData(da){
+			var re = /^[0-9]+.?[0-9]*$/;
+			var v;
+			if(da == null){
+				v = $("#searchValue").val();
+			}else{
+				$("#searchValue").val(da);
+				v = da;
+			}
+			if(re.test(v)){
+				if(Number(v)<0 || Number(v)>999999){
+					var txt="请输入正确的值：区块高度、交易Hash、Token！";
+					window.wxc.xcConfirm(txt, window.wxc.xcConfirm.typeEnum.info);
+				}else{
+					$("#main").load('block.html', 
+	                             function(){}
+	                     );
+				updateUCss("block");
+				}
+			}else{
+				if(v.length == 66){
+					$("#main").load('transaction.html', 
+	                             function(){}
+	                     );
+					updateUCss("transaction");
+				}else if(v.length == 42){
+					$("#main").load('token.html', 
+	                             function(){}
+	                     );
+                     updateUCss("token");
+				}else{
+					var txt="请输入正确的值：区块高度、交易Hash、Token！";
+					window.wxc.xcConfirm(txt, window.wxc.xcConfirm.typeEnum.info)
+				}
+			}
+		}
+	</script>
+  </body>
+</html>

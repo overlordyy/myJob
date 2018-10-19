@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vns.dao.ReportTxMapper">
+    <resultMap id="BaseResultMap" type="com.vns.vo.ReportTransation">
+        <id column="ID" property="id" jdbcType="BIGINT"/>
+       	<result column="TransactionTotal" property="transactionTotal" jdbcType="DOUBLE"/>
+		<result column="TransactionNum" property="transactionNum" jdbcType="INTEGER"/>
+		<result column="TransactionPoundage" property="transactionPoundage" jdbcType="DOUBLE"/>
+		<result column="CreateDate" property="createDate" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <select id="getReportByTime" resultMap="BaseResultMap">
+        select ID,
+	        TransactionTotal,
+	        TransactionNum,
+	        TransactionPoundage,
+	        CreateDate
+        from t_report_transaction
+        where DATE_FORMAT(CreateDate,'%y-%m-%d') &gt;= DATE_FORMAT(#{beginDate,jdbcType=DATE},'%y-%m-%d') 
+        	and DATE_FORMAT(CreateDate,'%y-%m-%d') &lt;= DATE_FORMAT(#{endDate,jdbcType=DATE},'%y-%m-%d')
+        order by CreateDate asc
+    </select>
+    
+    <select id="getReportAllData" resultMap="BaseResultMap">
+        select ID,
+	        TransactionTotal,
+	        TransactionNum,
+	        TransactionPoundage,
+	        CreateDate
+        from t_report_transaction
+        order by CreateDate asc
+    </select>
+    
+    <select id="statTxData" resultMap="BaseResultMap">
+    	select 
+    	(select sum(t.TxValue) from t_transaction t where t.TransactionTime between #{beginDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}) as TransactionTotal,
+    	(select count(t.ID) from t_transaction t where t.TransactionTime between #{beginDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}) as TransactionNum,
+    	(select sum(t.TransactionPoundage) from t_transaction t where t.TransactionTime between #{beginDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}) as TransactionPoundage
+    </select>
+    
+    <select id="isExist" resultType="int">
+        select count(ID) from t_report_transaction where DATE_FORMAT(CreateDate,'%y-%m-%d') = DATE_FORMAT(#{createDate,jdbcType=DATE},'%y-%m-%d')
+    </select>
+    
+    <insert id="insert">
+    	insert into t_report_transaction
+    	(
+    		TransactionTotal,
+	        TransactionNum,
+	        TransactionPoundage,
+	        CreateDate
+    	)values(
+    		#{transactionTotal},
+    		#{transactionNum},
+    		#{transactionPoundage},
+    		#{createDate}
+    	)
+    </insert>
+    
+    <update id="update">
+    	update t_report_transaction set 
+    		TransactionTotal=#{transactionTotal},
+    		TransactionNum=#{transactionNum},
+    		TransactionPoundage=#{transactionPoundage}
+    	where DATE_FORMAT(CreateDate,'%y-%m-%d') = DATE_FORMAT(#{createDate,jdbcType=DATE},'%y-%m-%d')
+    </update>
+</mapper>
