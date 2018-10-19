@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vns.dao.TransactionMapper">
+    <resultMap id="BaseResultMap" type="com.vns.vo.TransactionInfo">
+        <id column="TransactionID" property="transactionID" jdbcType="VARCHAR"/>
+        <result column="Amount" property="amount" jdbcType="VARCHAR"/>
+        <result column="Poundage" property="poundage" jdbcType="VARCHAR"/>
+        <result column="Payer" property="payer" jdbcType="VARCHAR"/>
+        <result column="Receiver" property="receiver" jdbcType="VARCHAR"/>
+        <result column="TransactionTime" property="transactionTime" jdbcType="DATE"/>
+        <result column="TransactionType" property="transactionType" jdbcType="VARCHAR"/>
+        <result column="BlockID" property="blockId" jdbcType="VARCHAR"/>
+        <result column="BlockNumber" property="blockNumber" jdbcType="BIGINT"/>
+        <result column="transactionNum" property="transactionNum" jdbcType="VARCHAR"/>
+        <result column="transactionNumAmount" property="transactionNumAmount" jdbcType="VARCHAR"/>
+        <result column="transactionNumPoundage" property="transactionNumPoundage" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="findTransactionList" resultMap="BaseResultMap">
+        select 
+	        TransactionID,
+			Amount,
+			Poundage,
+			Payer,
+			Receiver,
+			TransactionTime,
+			TransactionType,
+			BlockID,
+			BlockNumber
+        from t_transaction
+        order by BlockNumber desc
+        <if test="blockId!=null">
+        	where BlockID = #{blockId,jdbcType=VARCHAR}
+        </if>
+        LIMIT #{beginIndex},25
+    </select>
+    
+    <select id="findTransactionListCount" resultType="int">
+    	select count(1) from t_transaction 
+        <if test="blockId!=null">
+        	where BlockID = #{blockId,jdbcType=VARCHAR}
+        </if>
+    </select>
+    
+    <select id="findTransactionInfoByBlock" resultMap="BaseResultMap">
+    	select 
+	        TransactionID,
+			Amount,
+			Poundage,
+			Payer,
+			Receiver,
+			TransactionTime,
+			TransactionType,
+			BlockID,
+			BlockNumber
+        from t_transaction
+        order by BlockNumber desc
+        where BlockID = #{blockId,jdbcType=VARCHAR}
+    </select>
+    
+    <insert id="addTransaction">
+    	insert into t_transaction
+	    (
+	   		TransactionID,
+			Amount,
+			Poundage,
+			Payer,
+			Receiver,
+			TransactionTime,
+			TransactionType,
+			BlockID,
+			BlockNumber
+		)values(
+			#{transactionID},
+			#{amount},
+			#{poundage},
+			#{payer},
+			#{receiver},
+			#{transactionTime},
+			#{transactionType},
+			#{blockId},
+			#{blockNumber}
+		)
+    </insert>
+    
+    <select id="transactionDivInfo" resultMap="BaseResultMap">
+    	select count(1) as transactionNum,SUM(Amount) as transactionNumAmount,SUM(Poundage) as transactionNumPoundage from t_transaction;
+    </select>
+    
+    <select id="findAllTransaction" resultMap="BaseResultMap">
+        select 
+	        distinct(BlockNumber) as BlockNumber
+        from t_transaction
+        LIMIT 20000,100000
+    </select>
+    
+</mapper>

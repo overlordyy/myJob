@@ -1,0 +1,26 @@
+package com.vns.vo;
+
+/**
+ * Token的用户，用以统计Token有多少用户使用
+ * @author Lvp
+ *
+ */
+public class TokenUser extends BaseDomain {
+
+	private String contractAddress; // 合约地址
+	private String userAddress; // 用户地址
+	
+	public String getContractAddress() {
+		return contractAddress;
+	}
+	public void setContractAddress(String contractAddress) {
+		this.contractAddress = contractAddress;
+	}
+	public String getUserAddress() {
+		return userAddress;
+	}
+	public void setUserAddress(String userAddress) {
+		this.userAddress = userAddress;
+	}
+	
+}

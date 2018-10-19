@@ -1,0 +1,67 @@
+package com.vns.controller;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.vns.service.ITransactionService;
+import com.vns.vo.DataResult;
+import com.vns.vo.TableSplitResult;
+import com.vns.vo.TransactionInfo;
+
+@Controller
+@RequestMapping("/transaction")
+public class VnsTransactionController {
+
+	@Autowired
+	public ITransactionService its;
+	
+	/**
+	 * 查询所有交易
+	 * @param ti
+	 * @return
+	 */
+	@RequestMapping(value="/listInfo",method=RequestMethod.GET)
+	@ResponseBody
+    public TableSplitResult findTransactionList(TransactionInfo ti)
+    {
+        return its.findTransactionList(ti);
+    }
+	
+	/**
+	 * 根据区块查询交易
+	 * @return
+	 */
+	@RequestMapping(value="/findTransaction",method=RequestMethod.GET)
+	@ResponseBody
+	public TableSplitResult<TransactionInfo> findTransactionInfoByBlock(TransactionInfo ti){
+		return its.findTransactionInfoByBlock(ti.getBlockHash());
+	}
+	
+	/**
+	 * 根据区块查询交易
+	 * @return
+	 */
+	@RequestMapping(value="/transactionDivInfo",method=RequestMethod.GET)
+	@ResponseBody
+	public DataResult<TransactionInfo> transactionDivInfo(){
+		return its.transactionDivInfo();
+	}
+	
+	/**
+	 * 根据区块查询交易
+	 * @return
+	 */
+	@RequestMapping(value="/updateTransactionToAddressByInput",method=RequestMethod.GET)
+	@ResponseBody
+	public void updateTransactionToAddressByInput(){
+		its.updateTransactionToAddressByInput();
+	}
+}

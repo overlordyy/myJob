@@ -1,0 +1,103 @@
+package com.vns.service.impl;
+
+import java.math.BigInteger;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.web3j.abi.datatypes.Utf8String;
+import org.web3j.abi.datatypes.generated.Uint256;
+import org.web3j.abi.datatypes.generated.Uint8;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.methods.response.EthBlock;
+import org.web3j.protocol.core.methods.response.EthBlock.TransactionObject;
+import org.web3j.protocol.core.methods.response.EthBlock.TransactionResult;
+import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
+import org.web3j.protocol.http.HttpService;
+import org.web3j.protocol.vns.VnsWeb3j;
+
+import com.vns.api.VnsTokenRpcApi;
+import com.vns.dao.TokenMapper;
+import com.vns.service.ITokenService;
+import com.vns.service.ITransactionService;
+import com.vns.vo.TableSplitResult;
+import com.vns.vo.TokenInfo;
+import com.vns.vo.TransactionInfo;
+
+@Service
+public class TokenService implements ITokenService{
+
+	@Autowired
+	public TokenMapper tm;
+	@Autowired
+	public ITransactionService its;
+	@Override
+	public TableSplitResult<TokenInfo> findTokenList(TokenInfo ti) {
+		TableSplitResult<TokenInfo> result = new TableSplitResult<TokenInfo>();
+		int count = tm.queryAllForCount(ti);
+		if(count != 0){
+			result.setRows(tm.queryAll(ti));
+			result.setTotal(count);
+		}
+		return result;
+	}
+	@Override
+	public void tokenSta() {
+		VnsWeb3j vnsWeb3j = VnsWeb3j.build(new HttpService("http://132.232.166.46:8585/"));
+		try {
+			//查询交易数据并通过交易hash去获取交易数据
+			List<TransactionInfo> tiList = its.findAllTransaction();
+			for (TransactionInfo ti : tiList) {
+//				Block bk = VnsRpcApi.getBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(ti.getBlockNumber())), false);
+//				List<TransactionResult> transactions = bk.getTransactions();
+				DefaultBlockParameter param = DefaultBlockParameter.valueOf(BigInteger.valueOf(ti.getBlockNumber()));
+	        	EthBlock eblock=null;
+	        	try {
+					eblock = vnsWeb3j.ethGetBlockByNumber(param,true).send();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				List<TransactionResult> transactions = eblock.getBlock().getTransactions();
+				for (TransactionResult trs : transactions) {
+					TransactionObject to = (TransactionObject) trs.get();
+					EthGetTransactionReceipt transactionReceipt = vnsWeb3j.ethGetTransactionReceipt(to.getHash()).send();
+
+					if(transactionReceipt.getResult().getContractAddress()!=null){
+						TokenInfo tokeni = new TokenInfo();
+						System.out.println(transactionReceipt);
+						Utf8String name = VnsTokenRpcApi.name("0x1C4749A6e7082aac17083029c9eb2DCe4045d912", transactionReceipt.getResult().getContractAddress());
+						Uint256 balance = VnsTokenRpcApi.balance("0x1C4749A6e7082aac17083029c9eb2DCe4045d912", transactionReceipt.getResult().getContractAddress());
+						Uint8 decimals = VnsTokenRpcApi.decimals("0x1C4749A6e7082aac17083029c9eb2DCe4045d912", transactionReceipt.getResult().getContractAddress());
+						Utf8String symbol = VnsTokenRpcApi.symbol("0x1C4749A6e7082aac17083029c9eb2DCe4045d912", transactionReceipt.getResult().getContractAddress());
+						Uint256 totalSupply = VnsTokenRpcApi.totalSupply("0x1C4749A6e7082aac17083029c9eb2DCe4045d912", transactionReceipt.getResult().getContractAddress());
+						if(name!=null){
+							tokeni.setTokenEnName(name.toString());
+						}
+						tokeni.setTokenReceivetAddress(transactionReceipt.getResult().getContractAddress());
+						if(symbol!=null){
+							tokeni.setTokenName(symbol.toString());
+						}
+						if(balance!=null){
+							tokeni.setTokenBalance(balance.getValue().longValue());
+						}
+
+						if(decimals!=null){
+							tokeni.setTokenDecimals(decimals.getValue().longValue());
+						}
+
+						if(totalSupply!=null){
+							tokeni.setTokenTotal(totalSupply.getValue().toString());
+						}
+						//判断是否在库里面已经存在
+						if(tm.findTokenByAddress(transactionReceipt.getResult().getContractAddress())==0){
+							tm.insertToken(tokeni);
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+}

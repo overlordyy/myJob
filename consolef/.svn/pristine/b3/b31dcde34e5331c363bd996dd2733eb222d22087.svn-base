@@ -1,0 +1,41 @@
+package com.vns.vo;
+
+import java.util.Date;
+
+import com.vns.query.QueryObject;
+
+/**
+ * 区块信息
+ * @author Lvp
+ *
+ */
+public class BlockInfo extends QueryObject{
+	
+	public String blockHash;//区块hash
+	public long blockNumber;//区块高度
+	public String parentHash;//父hash
+	public Date blockTime;//区块生成时间
+	public String miner;//开矿矿工地址
+	public long blockSize;//区块大小
+	public String difficulty;//当前区块难度
+	public String totalDifficulty;//链总难度
+	public Integer transactionsNum;//交易数
+	public Integer uncleNum;//叔块数
+	public String gasLimit;
+	public String gasUsed;
+	public String extraData;
+	public String logsBloom;
+	public String mixHash;
+	public String nonce;
+	public String receiptsRoot;
+	public String sealFields;
+	public String sha3Uncles;
+	public String stateRoot;
+	public String transactionsRoot;
+	public String author;
+	public int isUncle;//此块是否为叔块
+	public long refUncleBlockHeight;//包含此叔块的区块高度
+	public float blockPoundage;//区块包含交易的总手续费
+	public float minerReward;//挖矿奖励
+	public float refUncleReward;//叔块引用奖励
+}

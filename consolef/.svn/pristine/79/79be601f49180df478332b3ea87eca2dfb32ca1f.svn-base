@@ -1,0 +1,35 @@
+package com.vns.controller;
+
+public class InitSql {
+
+	public static void main(String[] args) {
+		String sqlStr = "";
+		String argStr = "";
+		String[] argArr = argStr.split(",");
+		for (String arg : argArr) {
+			try {
+				arg = arg.trim();
+				String replacement = null;
+				if("null".equals(arg)){
+					replacement="";
+				}else if(arg.contains("(Integer)")){
+					arg = arg.replaceAll("\\(Integer\\)","");
+					replacement = arg;
+				}else if(arg.contains("(Float)")){
+					arg = arg.replaceAll("\\(Float\\)","");
+					replacement = arg;
+				}else if(arg.contains("(Long)")){
+					arg = arg.replaceAll("\\(Long\\)","");
+					replacement = arg;
+				}else if(arg.contains("(String)")){
+					arg = arg.replaceAll("\\(String\\)","");
+					replacement = "'"+arg+"'";
+				}
+				sqlStr = sqlStr.replaceFirst("\\?", replacement);
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			System.out.println(sqlStr);
+		}
+	}
+}

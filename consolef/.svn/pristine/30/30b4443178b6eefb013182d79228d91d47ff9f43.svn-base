@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vns.dao.BlockMapper">
+    <resultMap id="BaseResultMap" type="com.vns.vo.BlockInfo">
+        <id column="ID" property="id" jdbcType="BIGINT"/>
+       	<result column="BlockHash" property="blockHash" jdbcType="VARCHAR"/>
+		<result column="BlockNumber" property="blockNumber" jdbcType="BIGINT"/>
+		<result column="ParentHash" property="parentHash" jdbcType="VARCHAR"/>
+		<result column="BlockTime" property="blockTime" jdbcType="DATE"/>
+		<result column="Miner" property="miner" jdbcType="VARCHAR"/>
+		<result column="BlockSize" property="blockSize" jdbcType="BIGINT"/>
+		<result column="Difficulty" property="difficulty" jdbcType="VARCHAR"/>
+		<result column="TotalDifficulty" property="totalDifficulty" jdbcType="VARCHAR"/>
+		<result column="TransactionsNum" property="transactionsNum" jdbcType="BIGINT"/>
+		<result column="UnclesNum" property="uncleNum" jdbcType="BIGINT"/>
+		<result column="GasLimit" property="gasLimit" jdbcType="VARCHAR"/>
+		<result column="GasUsed" property="gasUsed" jdbcType="VARCHAR"/>
+		<result column="ExtraData" property="extraData" jdbcType="VARCHAR"/>
+		<result column="LogsBloom" property="logsBloom" jdbcType="VARCHAR"/>
+		<result column="MixHash" property="mixHash" jdbcType="VARCHAR"/>
+		<result column="Nonce" property="nonce" jdbcType="BIGINT"/>
+		<result column="ReceiptsRoot" property="receiptsRoot" jdbcType="VARCHAR"/>
+		<result column="SealFields" property="sealFields" jdbcType="VARCHAR"/>
+		<result column="Sha3Uncles" property="sha3Uncles" jdbcType="VARCHAR"/>
+		<result column="StateRoot" property="stateRoot" jdbcType="VARCHAR"/>
+		<result column="TransactionsRoot" property="transactionsRoot" jdbcType="VARCHAR"/>
+		<result column="Author" property="author" jdbcType="VARCHAR"/>
+		<result column="isUncle" property="isUncle" jdbcType="BIGINT"/>
+		<result column="RefUncleBlockHeight" property="refUncleBlockHeight" jdbcType="BIGINT"/>
+		<result column="BlockPoundage" property="blockPoundage" jdbcType="FLOAT"/>
+		<result column="MinerReward" property="minerReward" jdbcType="FLOAT"/>
+		<result column="RefUncleReward" property="refUncleReward" jdbcType="FLOAT"/>
+		<result column="UncleReward" property="uncleReward" jdbcType="FLOAT"/>
+		<result column="RewardSum" property="rewardSum" jdbcType="FLOAT"/>
+    </resultMap>
+
+    <select id="findBlockList" resultMap="BaseResultMap">
+        select BlockID,
+	        BlockNumber,
+	        BlockMiner,
+	        BlockTime,
+	        BlockVolume,
+	        TXAmount,
+	        BlockPoundage,
+	        Reward
+        from t_block
+        LIMIT #{beginIndex},#{pageSize}
+    </select>
+    
+    <select id="findBlockListOrder" resultMap="BaseResultMap">
+        select BlockID,
+	        BlockNumber,
+	        BlockMiner,
+	        BlockTime,
+	        BlockVolume,
+	        TXAmount,
+	        BlockPoundage,
+	        Reward
+        from t_block
+        order by BlockNumber desc
+        LIMIT 0,25
+    </select>
+    
+    <select id="findBlockListCount" resultType="int">
+    	select count(1) from t_block;
+    </select>
+    
+    <select id="findBlock" resultMap="BaseResultMap">
+    	select BlockID,
+	        BlockNumber,
+	        BlockMiner,
+	        BlockTime,
+	        BlockVolume,
+	        TXAmount,
+	        BlockPoundage,
+	        Reward
+        from t_block
+        order by BlockNumber desc
+        LIMIT 0,3
+    </select>
+    
+    <select id="findBlockByBlockNumber" resultMap="BaseResultMap">
+    	select BlockID,
+	        BlockNumber,
+	        BlockMiner,
+	        BlockTime,
+	        BlockVolume,
+	        TXAmount,
+	        BlockPoundage,
+	        Reward
+        from t_block
+        where BlockNumber &lt;= #{blockNumber,jdbcType=NUMERIC}
+        order by BlockNumber desc
+        LIMIT 0,3
+    </select>
+    
+    <select id="blockDivInfo" resultMap="BaseResultMap">
+    	select BlockID,
+	        BlockNumber,
+	        BlockMiner,
+	        BlockTime,
+	        BlockVolume,
+	        TXAmount,
+	        BlockPoundage,
+	        Reward
+        from t_block
+        order by BlockNumber desc
+        LIMIT 1
+    </select>
+    
+    <delete id="deleteBlock">
+    	delete from t_block
+    </delete>
+    
+    <insert id="insertBlock">
+    	insert into t_block
+    	(
+    		BlockHash,
+			BlockNumber,
+			ParentHash,
+			BlockTime,
+			Miner,
+			BlockSize,
+			Difficulty,
+			TotalDifficulty,
+			TransactionsNum,
+			UnclesNum,
+			GasLimit,
+			GasUsed,
+			ExtraData,
+			LogsBloom,
+			MixHash,
+			Nonce,
+			ReceiptsRoot,
+			SealFields,
+			Sha3Uncles,
+			StateRoot,
+			TransactionsRoot,
+			Author,
+			isUncle,
+			RefUncleBlockHeight,
+			BlockPoundage,
+			MinerReward,
+			RefUncleReward,
+			UncleReward,
+			RewardSum
+    	)values(
+    		#{blockHash},
+			#{blockNumber},
+			#{parentHash},
+			#{blockTime},
+			#{miner},
+			#{blockSize},
+			#{difficulty},
+			#{totalDifficulty},
+			#{transactionsNum},
+			#{uncleNum},
+			#{gasLimit},
+			#{gasUsed},
+			#{extraData},
+			#{logsBloom},
+			#{mixHash},
+			#{nonce},
+			#{receiptsRoot},
+			#{sealFields},
+			#{sha3Uncles},
+			#{stateRoot},
+			#{transactionsRoot},
+			#{author},
+			#{isUncle},
+			#{refUncleBlockHeight},
+			#{blockPoundage},
+			#{minerReward},
+			#{refUncleReward},
+			#{uncleReward},
+			#{rewardSum}
+    	)
+    </insert>
+    
+    <select id="findBlockByHash" resultType="int">
+    	select
+    		count(1)
+		from
+			t_block
+		<where>
+			<if test="blockHash!=null">
+				BlockHash = #{blockHash}
+			</if>
+		</where>
+    </select>
+</mapper>

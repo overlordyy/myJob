@@ -1,0 +1,202 @@
+package com.vns.service.impl;
+
+import java.math.BigInteger;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.web3j.abi.FunctionReturnDecoder;
+import org.web3j.abi.TypeReference;
+import org.web3j.abi.Utils;
+import org.web3j.abi.datatypes.Address;
+import org.web3j.abi.datatypes.Type;
+import org.web3j.abi.datatypes.generated.Uint256;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.methods.response.EthBlock;
+import org.web3j.protocol.core.methods.response.EthBlock.Block;
+import org.web3j.protocol.core.methods.response.EthBlock.TransactionObject;
+import org.web3j.protocol.core.methods.response.EthBlock.TransactionResult;
+import org.web3j.protocol.core.methods.response.EthBlockNumber;
+import org.web3j.protocol.core.methods.response.EthGetBalance;
+import org.web3j.protocol.http.HttpService;
+import org.web3j.protocol.vns.VnsWeb3j;
+
+import rx.Subscription;
+
+import com.vns.dao.BlockMapper;
+import com.vns.service.IBlockService;
+import com.vns.service.ITransactionService;
+import com.vns.vo.BlockInfo;
+import com.vns.vo.DataResult;
+import com.vns.vo.TableSplitResult;
+import com.vns.vo.TransactionInfo;
+
+
+@Service
+public class BlockService implements IBlockService {
+
+	@Autowired
+	private BlockMapper bm;
+	@Autowired
+	private ITransactionService its;
+	
+	public static Subscription subscription;
+	public static String formats = "yyyy-MM-dd HH:mm:ss";
+	@Override
+	public TableSplitResult<BlockInfo> findBlockList(BlockInfo bi) {
+		TableSplitResult<BlockInfo> result = new TableSplitResult<BlockInfo>();
+		List<BlockInfo> biList = bm.findBlockListOrder();
+		result.setRows(biList);
+		result.setTotal(biList.size());
+		return result;
+	}
+	
+	/**
+	 * 通过高度进行区块查询
+	 */
+	@Override
+	public DataResult<BlockInfo> findBlock(int blockNumber) {
+		DataResult<BlockInfo> dr = new DataResult<BlockInfo>();
+		//判断区块高度查询条件是否为0，如果为0，就查出默认三个区块，如果不为0，则查出前后区块。
+		if(blockNumber==1){
+			dr.setDataList(bm.findBlock());
+			dr.setStatus(1);
+			dr.setMsg("OK！");
+		}else{
+			//查询高度减1和高度加1的区块
+			dr.setDataList(bm.findBlockByBlockNumber(blockNumber));
+			dr.setStatus(1);
+			dr.setMsg("OK！");
+		}
+		return dr;
+	}
+
+	@Override
+	public void blockSta() {
+		VnsWeb3j vnsWeb3j = VnsWeb3j.build(new HttpService("http://132.232.166.46:8585/"));
+		try {
+			EthGetBalance ethGetBalance = vnsWeb3j.ethGetBalance("0x1C4749A6e7082aac17083029c9eb2DCe4045d912", DefaultBlockParameter.valueOf("latest")).send();
+			String balance = ethGetBalance.getBalance().toString();
+			EthBlockNumber bn = vnsWeb3j.ethBlockNumber().send();
+			if(subscription==null){
+				subscription = vnsWeb3j.catchUpToLatestAndSubscribeToNewBlocksObservable(DefaultBlockParameter.valueOf(BigInteger.valueOf(588482)), false).subscribe(block -> {
+					Date date = new Date();
+					Block bl = block.getBlock();
+					BlockInfo bi = new BlockInfo();
+//					bi.setBlockID(bl.getHash());
+//					bi.setBlockNumber(bl.getNumber().longValue());
+//					bi.setBlockMiner(bl.getMiner());
+//			        Long timestamp = bl.getTimestamp().longValue() * 1000;
+//					bi.setBlockTime(new Date(timestamp));
+//					bi.setBlockVolume(bl.getSize().longValue());
+					//通过区块去查询交易
+					EthBlock eblock=null;
+					DefaultBlockParameter param = DefaultBlockParameter.valueOf(BigInteger.valueOf(bl.getNumber().longValue()));
+					try {
+						eblock = vnsWeb3j.ethGetBlockByNumber(param,true).send();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					List<TransactionResult> transactions = eblock.getBlock().getTransactions();
+					for (TransactionResult tr : transactions) {
+						TransactionInfo ti = new TransactionInfo();
+						TransactionObject to = (TransactionObject) tr.get();
+						ti.setTransactionID(to.getHash());
+						ti.setBlockId(to.getBlockHash());
+						ti.setBlockNumber(to.getBlockNumber().longValue());
+						ti.setAmount(String.valueOf(to.getValue().longValue()));
+						ti.setPayer(to.getFrom());
+						ti.setReceiver(to.getTo());
+						List<Type> s = decodeFunctionInput(to.getInput());
+						System.out.println();
+						its.addTransaction(ti);
+					}
+//					bi.setTxAmount(transactions.size());
+					bm.insertBlock(bi);
+				});
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void seqNewBlock() {
+		VnsWeb3j vnsWeb3j = VnsWeb3j.build(new HttpService("http://132.232.166.46:8585/"));
+		try {
+			EthGetBalance ethGetBalance = vnsWeb3j.ethGetBalance("0x1C4749A6e7082aac17083029c9eb2DCe4045d912", DefaultBlockParameter.valueOf("latest")).send();
+			String balance = ethGetBalance.getBalance().toString();
+			EthBlockNumber bn = vnsWeb3j.ethBlockNumber().send();
+			if(subscription==null){
+				subscription = 
+					vnsWeb3j.blockObservable(false)
+					.subscribe(block -> {
+					Date date = new Date();
+					Block bl = block.getBlock();
+					BlockInfo bi = new BlockInfo();
+//					bi.setBlockID(bl.getHash());
+//					bi.setBlockNumber(bl.getNumber().longValue());
+//					bi.setBlockMiner(bl.getMiner());
+//			        Long timestamp = bl.getTimestamp().longValue() * 1000;
+//					bi.setBlockTime(new Date(timestamp));
+//					bi.setBlockVolume(bl.getSize().longValue());
+					//通过区块去查询交易
+					EthBlock eblock=null;
+					DefaultBlockParameter param = DefaultBlockParameter.valueOf(BigInteger.valueOf(bl.getNumber().longValue()));
+					try {
+						eblock = vnsWeb3j.ethGetBlockByNumber(param,true).send();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					List<TransactionResult> transactions = eblock.getBlock().getTransactions();
+					for (TransactionResult tr : transactions) {
+						TransactionInfo ti = new TransactionInfo();
+						TransactionObject to = (TransactionObject) tr.get();
+						ti.setTransactionID(to.getHash());
+						ti.setBlockId(to.getBlockHash());
+						ti.setBlockNumber(to.getBlockNumber().longValue());
+						ti.setAmount(String.valueOf(to.getValue().longValue()));
+						ti.setPayer(to.getFrom());
+						ti.setReceiver(to.getTo());
+						List<Type> s = decodeFunctionInput(to.getInput());
+						System.out.println();
+						its.addTransaction(ti);
+					}
+//					bi.setTxAmount(transactions.size());
+					bm.insertBlock(bi);
+				});
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void blockStop(){
+		subscription.unsubscribe();
+		subscription=null;
+	}
+
+	@Override
+	public DataResult<BlockInfo> blockDivInfo() {
+		DataResult<BlockInfo> dr = new DataResult<BlockInfo>();
+		//查询最新区块数据
+		dr.setData(bm.blockDivInfo());
+		return dr;
+	}
+	
+	public static List<Type> decodeFunctionInput(String input) {
+        List<Type> results = null;
+        if (input.length() < 128) {
+            return results;
+        }
+        results = FunctionReturnDecoder.decode(input.substring(input.length() - 128), Utils.convert(Arrays.asList(new TypeReference<Address>() {
+        }, new TypeReference<Uint256>() {
+        })));
+        return results;
+    }
+}

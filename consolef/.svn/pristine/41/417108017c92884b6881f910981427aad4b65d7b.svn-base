@@ -1,0 +1,104 @@
+package com.vns.vo;
+
+import com.vns.query.QueryObject;
+
+/**
+ * 交易信息
+ * @author Lvp
+ *
+ */
+public class TransactionInfo extends QueryObject{
+
+	private String transactionID; // 交易唯一标识，哈希或ID
+	private String amount; // 交易额度
+	private String poundage; // 交易手费费
+	private String payer; // 发起交易人，支付方
+	private String receiver; // 接收交易人，收取方
+	private String transactionTime; // 交易发生时间
+	private String transactionType; // 交易类型：1.转账2.空投
+	private BlockInfo block; // 所在区块
+	private String blockId;
+	private long blockNumber;
+	private String transactionNum;
+	private String transactionNumAmount;
+	private String transactionNumPoundage;
+	
+	public String getTransactionNum() {
+		return transactionNum;
+	}
+	public void setTransactionNum(String transactionNum) {
+		this.transactionNum = transactionNum;
+	}
+	public String getTransactionNumAmount() {
+		return transactionNumAmount;
+	}
+	public void setTransactionNumAmount(String transactionNumAmount) {
+		this.transactionNumAmount = transactionNumAmount;
+	}
+	public String getTransactionNumPoundage() {
+		return transactionNumPoundage;
+	}
+	public void setTransactionNumPoundage(String transactionNumPoundage) {
+		this.transactionNumPoundage = transactionNumPoundage;
+	}
+	public String getBlockId() {
+		return blockId;
+	}
+	public void setBlockId(String blockId) {
+		this.blockId = blockId;
+	}
+	public long getBlockNumber() {
+		return blockNumber;
+	}
+	public void setBlockNumber(long blockNumber) {
+		this.blockNumber = blockNumber;
+	}
+	public String getTransactionID() {
+		return transactionID;
+	}
+	public void setTransactionID(String transactionID) {
+		this.transactionID = transactionID;
+	}
+	public String getAmount() {
+		return amount;
+	}
+	public void setAmount(String amount) {
+		this.amount = amount;
+	}
+	public String getPoundage() {
+		return poundage;
+	}
+	public void setPoundage(String poundage) {
+		this.poundage = poundage;
+	}
+	public String getPayer() {
+		return payer;
+	}
+	public void setPayer(String payer) {
+		this.payer = payer;
+	}
+	public String getReceiver() {
+		return receiver;
+	}
+	public void setReceiver(String receiver) {
+		this.receiver = receiver;
+	}
+	public String getTransactionTime() {
+		return transactionTime;
+	}
+	public void setTransactionTime(String transactionTime) {
+		this.transactionTime = transactionTime;
+	}
+	public String getTransactionType() {
+		return transactionType;
+	}
+	public void setTransactionType(String transactionType) {
+		this.transactionType = transactionType;
+	}
+	public BlockInfo getBlock() {
+		return block;
+	}
+	public void setBlock(BlockInfo block) {
+		this.block = block;
+	}
+}

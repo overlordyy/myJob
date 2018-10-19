@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vns.dao.TransactionMapper">
+    <resultMap id="BaseResultMap" type="com.vns.vo.TransactionInfo">
+        <id column="ID" property="id" jdbcType="INTEGER"/>
+        <result column="Hash" property="hash" jdbcType="VARCHAR"/>
+        <result column="BlockHash" property="blockHash" jdbcType="VARCHAR"/>
+        <result column="BlockNumber" property="blockNumber" jdbcType="INTEGER"/>
+        <result column="Creates" property="creates" jdbcType="VARCHAR"/>
+        <result column="FromAddress" property="fromAddress" jdbcType="VARCHAR"/>
+        <result column="ToAddress" property="toAddress" jdbcType="VARCHAR"/>
+        <result column="TxValue" property="txValue" jdbcType="DOUBLE"/>
+        <result column="Gas" property="gas" jdbcType="FLOAT"/>
+        <result column="GasPrice" property="gasPrice" jdbcType="FLOAT"/>
+        <result column="Input" property="input" jdbcType="VARCHAR"/>
+        <result column="Nonce" property="nonce" jdbcType="VARCHAR"/>
+        <result column="PublicKey" property="publicKey" jdbcType="VARCHAR"/>
+        <result column="R" property="r" jdbcType="VARCHAR"/>
+        <result column="Raw" property="raw" jdbcType="VARCHAR"/>
+        <result column="S" property="s" jdbcType="VARCHAR"/>
+        <result column="TransactionIndex" property="transactionIndex" jdbcType="VARCHAR"/>
+        <result column="V" property="v" jdbcType="VARCHAR"/>
+        <result column="TransactionTime" property="transactionTime" jdbcType="DATE"/>
+        <result column="TransactionType" property="transactionType" jdbcType="INTEGER"/>
+        <result column="ContractAddress" property="contractAddress" jdbcType="VARCHAR"/>
+        <result column="TransactionPoundage" property="transactionPoundage" jdbcType="DOUBLE"/>
+    </resultMap>
+
+    <select id="findTransactionList" resultMap="BaseResultMap">
+        select 
+        	ID,
+	        Hash,
+	        BlockHash,
+	        BlockNumber,
+	        FromAddress,
+	        ToAddress,
+	        TxValue,
+	        Gas,
+	        GasPrice,
+			Input,
+			Nonce,
+			PublicKey,
+			TransactionIndex,
+			TransactionTime,
+			TransactionType,
+			ContractAddress,
+			TransactionPoundage
+        from t_transaction
+        order by BlockNumber desc
+        <if test="blockHash!=null">
+        	where BlockHash = #{blockHash,jdbcType=VARCHAR}
+        </if>
+        LIMIT #{beginIndex},25
+    </select>
+    
+    <select id="findTransactionListCount" resultType="int">
+    	select count(1) from t_transaction 
+        <if test="blockHash!=null">
+        	where BlockHash = #{blockHash,jdbcType=VARCHAR}
+        </if>
+    </select>
+    
+    <select id="findTransactionInfoByBlock" resultMap="BaseResultMap">
+    	select 
+	        ID,
+	        Hash,
+	        BlockHash,
+	        BlockNumber,
+	        FromAddress,
+	        ToAddress,
+	        TxValue,
+	        Gas,
+	        GasPrice,
+			Input,
+			Nonce,
+			PublicKey,
+			TransactionTime,
+			TransactionType,
+			ContractAddress,
+			TransactionPoundage
+        from t_transaction
+        order by BlockNumber desc
+        where BlockHash = #{blockHash,jdbcType=VARCHAR}
+    </select>
+    
+    <insert id="addTransaction">
+		CALL PROC_ADD_TRANSACTION(#{hash},#{blockHash},#{blockNumber},#{creates},#{fromAddress},#{toAddress},#{txValue},#{gas},#{gasPrice},#{input},#{nonce},#{publicKey},#{r},#{raw},#{s},#{transactionIndex},#{v},#{transactionTime},#{transactionType},#{contractAddress},#{transactionPoundage},#{gasUsed},#{status})
+    </insert>
+    
+    <select id="transactionDivInfo" resultMap="BaseResultMap">
+    	select count(1) as transactionNum,SUM(Value) as transactionNumAmount,SUM(TransactionPoundage) as transactionNumPoundage from t_transaction;
+    </select>
+    
+    <select id="findAllTransaction" resultMap="BaseResultMap">
+        select 
+	        distinct(BlockNumber) as BlockNumber
+        from t_transaction
+        LIMIT 20000,100000
+    </select>
+    
+</mapper>

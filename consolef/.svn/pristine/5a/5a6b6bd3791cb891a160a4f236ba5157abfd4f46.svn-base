@@ -1,0 +1,20 @@
+package com.vns.service;
+
+import java.util.List;
+
+import com.vns.vo.DataResult;
+import com.vns.vo.TableSplitResult;
+import com.vns.vo.TransactionInfo;
+
+public interface ITransactionService {
+	
+	public TableSplitResult<TransactionInfo> findTransactionList(TransactionInfo ti);
+	
+	public TableSplitResult<TransactionInfo> findTransactionInfoByBlock(String blockId);
+	
+	public void addTransaction(TransactionInfo ti);
+	
+	public DataResult<TransactionInfo> transactionDivInfo();
+	//查询所有交易
+	public List<TransactionInfo> findAllTransaction();
+}

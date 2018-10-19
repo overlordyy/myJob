@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vns.dao.TokenUserMapper">
+    <resultMap id="BaseResultMap" type="com.vns.vo.TokenUser">
+        <id column="ID" property="id" jdbcType="INTEGER"/>
+        <result column="ContractAddress" property="contractAddress" jdbcType="VARCHAR"/>
+        <result column="UserAddress" property="userAddress" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="query" resultMap="BaseResultMap">
+        select 
+	        ID,
+	        ContractAddress,
+	        UserAddress
+        from t_token_users
+    </select>
+    <select id="queryCount" resultType="int">
+        SELECT COUNT(ID) FROM t_token_users
+    </select>
+    
+    <select id="isExists" resultType="int">
+        SELECT COUNT(ID) FROM t_token_users ContractAddress = #{contractAddress} and UserAddress = #{userAddress}
+    </select>
+    
+    <insert id="insert">
+    	insert into t_token_users(
+    		ContractAddress,
+	        UserAddress
+    	)values(
+    		#{contractAddress},
+    		#{userAddress}
+    	)
+    </insert>
+    
+</mapper>

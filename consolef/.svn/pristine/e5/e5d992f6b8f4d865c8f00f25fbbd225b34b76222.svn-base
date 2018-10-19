@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vns.dao.HomeTransactionsMapper">
+    <resultMap id="BaseResultMap" type="com.vns.vo.HomeTransactions">
+        <id column="ID" property="id" jdbcType="INTEGER"/>
+        <result column="TransactionsSum" property="transactionsSum" jdbcType="BIGINT"/>
+        <result column="TransactionsPriceSum" property="transactionsPriceSum" jdbcType="DOUBLE"/>
+        <result column="GasSum" property="gasSum" jdbcType="DOUBLE"/>
+        <result column="PoundageSum" property="poundageSum" jdbcType="DOUBLE"/>
+        <result column="MinPoundage" property="minPoundage" jdbcType="FLOAT"/>
+        <result column="MinPoundageTxhash" property="minPoundageTxhash" jdbcType="VARCHAR"/>
+        <result column="MaxPoundage" property="maxPoundage" jdbcType="FLOAT"/>
+        <result column="MaxPoundageTxhash" property="maxPoundageTxhash" jdbcType="VARCHAR"/>
+        <result column="MinTransactionsPrice" property="minTransactionsPrice" jdbcType="FLOAT"/>
+        <result column="MinTransactionsPriceTxhash" property="minTransactionsPriceTxhash" jdbcType="VARCHAR"/>
+        <result column="MaxTransactionsPrice" property="maxTransactionsPrice" jdbcType="FLOAT"/>
+        <result column="MaxTransactionsPriceTxhash" property="maxTransactionsPriceTxhash" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="query" resultMap="BaseResultMap">
+        select 
+	        ID,
+	        TransactionsSum,
+	        TransactionsPriceSum,
+	        GasSum,
+	        PoundageSum,
+	        MinPoundage,
+	        MinPoundageTxhash,
+	        MaxPoundage,
+	        MaxPoundageTxhash,
+	        MinTransactionsPrice,
+	        MinTransactionsPriceTxhash,
+	        MaxTransactionsPrice,
+	        MaxTransactionsPriceTxhash
+        from t_home_transactions
+    </select>
+    <select id="queryCount" resultType="int">
+        SELECT COUNT(ID) FROM t_home_transactions
+    </select>
+    
+    <insert id="insert">
+    	insert into t_home_transactions(
+    		TransactionsSum,
+	        TransactionsPriceSum,
+	        GasSum,
+	        PoundageSum,
+	        MinPoundage,
+	        MinPoundageTxhash,
+	        MaxPoundage,
+	        MaxPoundageTxhash,
+	        MinTransactionsPrice,
+	        MinTransactionsPriceTxhash,
+	        MaxTransactionsPrice,
+	        MaxTransactionsPriceTxhash
+    	)values(
+    		#{transactionsSum},
+    		#{transactionsPriceSum},
+    		#{gasSum},
+    		#{poundageSum},
+    		#{minPoundage},
+    		#{minPoundageTxhash},
+    		#{maxPoundage},
+    		#{maxPoundageTxhash},
+    		#{minTransactionsPrice},
+    		#{minTransactionsPriceTxhash},
+    		#{maxTransactionsPrice},
+    		#{maxTransactionsPriceTxhash}
+    	)
+    </insert>
+    
+    <update id="update">
+    	update t_home_transactions set 
+    		TransactionsSum=#{transactionsSum},
+    		TransactionsPriceSum=#{transactionsPriceSum},
+    		GasSum=#{gasSum},
+    		PoundageSum=#{poundageSum},
+    		MinPoundage=#{minPoundage},
+    		MinPoundageTxhash=#{minPoundageTxhash},
+    		MaxPoundage=#{maxPoundage},
+    		MaxPoundageTxhash=#{maxPoundageTxhash},
+    		MinTransactionsPrice=#{minTransactionsPrice},
+    		minTransactionsPriceTxhash=#{minTransactionsPriceTxhash},
+    		MaxTransactionsPrice=#{maxTransactionsPrice},
+    		MaxTransactionsPriceTxhash=#{maxTransactionsPriceTxhash}
+    	where ID=#{id}
+    </update>
+    
+</mapper>
